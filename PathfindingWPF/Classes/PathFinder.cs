@@ -20,7 +20,7 @@ namespace PathfindingWPF.Classes
                 openSet.Remove(currentNode);
                 closedSet.Add(currentNode);
 
-                foreach (Node neighborNode in currentNode.NeighborNodes)
+                foreach (Node neighborNode in currentNode.GetNeighborNodes())
                 {
                     if (!closedSet.Contains(neighborNode))
                     {

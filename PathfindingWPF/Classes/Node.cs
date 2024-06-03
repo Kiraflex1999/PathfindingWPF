@@ -1,11 +1,11 @@
-﻿using System.Drawing;
+﻿using System.Windows;
 
 namespace PathfindingWPF.Classes
 {
     internal class Node
     {
         public Point Point { get; set; }
-        public List<Node> NeighborNodes { get; set; }
+        private List<Node> _NeighborNodes { get; set; }
         public double Radius { get; set; } = 10;
 
         public double GCost { get; set; }   //distance from starting node
@@ -17,13 +17,26 @@ namespace PathfindingWPF.Classes
         public Node(Point point) 
         {
             Point = point;
-            NeighborNodes = new List<Node>();
+            _NeighborNodes = new List<Node>();
         }
 
         public Node(Point point, List<Node> neighbors) 
         {
             Point = point;
-            NeighborNodes = neighbors;
+            _NeighborNodes = neighbors;
+        }
+
+        public void AddNeighbor(Node node)
+        {
+            if (_NeighborNodes.Where(n => n.Point == node.Point).Count() < 1) 
+            {
+                _NeighborNodes.Add(node);
+            }
+        }
+
+        public List<Node> GetNeighborNodes()
+        {
+            return _NeighborNodes;
         }
     }
 }

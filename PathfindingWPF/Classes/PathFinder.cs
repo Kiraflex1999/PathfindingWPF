@@ -64,7 +64,10 @@ namespace PathfindingWPF.Classes
 
         private double CalculateHypotenuse(Node currentNode, Node neighborNode)
         {
-            throw new NotImplementedException();
+            double x = Math.Abs(currentNode.Point.X - neighborNode.Point.X);
+            double y = Math.Abs(currentNode.Point.Y - neighborNode.Point.Y);
+            
+            return Math.Sqrt(x * x + y * y);
         }
 
         private List<Node> ReconstructPath(Node startNode, Node endNode)

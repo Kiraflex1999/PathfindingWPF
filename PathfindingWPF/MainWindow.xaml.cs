@@ -29,7 +29,7 @@ namespace PathfindingWPF
             RectangleGeometry rectangleGeometry = new RectangleGeometry(new Rect(50, 50, 150, 100));
             geometryGroup.Children.Add(rectangleGeometry);
 
-            EllipseGeometry ellipseGeometry = new EllipseGeometry(new Point(300, 300), 50, 50);
+            EllipseGeometry ellipseGeometry = new EllipseGeometry(new Point(300, 300), 10, 10);
             geometryGroup.Children.Add(ellipseGeometry);
 
             PathGeometry pathGeometry = new PathGeometry();

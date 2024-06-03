@@ -1,8 +1,8 @@
 ﻿using PathfindingWPF.Classes;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Xml.Linq;
 
 namespace PathfindingWPF
 {
@@ -15,10 +15,17 @@ namespace PathfindingWPF
         {
             InitializeComponent();
 
-            TempNodesCreation();
+            List<Node> nodes = TempNodesCreation();
 
-            DrawPathOnCanvas(TempNodesCreation());
+            DrawPathOnCanvas(nodes);
 
+            PathFinder pathFinder = new PathFinder();
+            List<Node> path = pathFinder.Start(nodes[0], nodes[3]);   //node id -1 == index
+
+            foreach (Node node in path)
+            {
+                Debug.WriteLine(node.Point);
+            }
         }
 
         private List<Node> TempNodesCreation()
@@ -31,6 +38,15 @@ namespace PathfindingWPF
             Node node6 = new Node(new Point(700, 500));
             Node node7 = new Node(new Point(200, 600));
             Node node8 = new Node(new Point(600, 600));
+
+            node1.AddNeighbor(new List<Node> { node2, node5 });
+            node2.AddNeighbor(new List<Node> { node1, node3, node8 });
+            node3.AddNeighbor(new List<Node> { node2, node6, node4 });
+            node4.AddNeighbor(new List<Node> { node3, node6, node8 });
+            node5.AddNeighbor(new List<Node> { node1, node7 });
+            node6.AddNeighbor(new List<Node> { node3, node4, node8 });
+            node7.AddNeighbor(new List<Node> { node5, node8 });
+            node8.AddNeighbor(new List<Node> { node2, node4, node6, node7 });
 
             List<Node> nodes = new List<Node>
             {
@@ -55,6 +71,24 @@ namespace PathfindingWPF
             {
                 EllipseGeometry ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
                 geometryGroup.Children.Add(ellipseGeometry);
+            }
+
+            HashSet<NodePath> lines = new HashSet<NodePath>();
+
+            foreach (Node node in nodes)
+            {
+                foreach (Node neighbor in node.GetNeighborNodes())
+                {
+                    if (lines.Where(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)).Count() < 1)
+                    {
+                        PathGeometry pathGeometry = new PathGeometry();
+                        PathFigure pathFigure = new PathFigure { StartPoint = node.Point };
+                        pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
+                        pathGeometry.Figures.Add(pathFigure);
+                        geometryGroup.Children.Add(pathGeometry);
+                        lines.Add(new NodePath(node, neighbor, pathGeometry));
+                    }
+                }
             }
 
             path.Data = geometryGroup;

@@ -34,6 +34,14 @@ namespace PathfindingWPF.Classes
             }
         }
 
+        public void AddNeighbor(List<Node> nodes)
+        {
+            foreach (Node node in nodes)
+            {
+                AddNeighbor(node);
+            }
+        }
+
         public List<Node> GetNeighborNodes()
         {
             return _NeighborNodes;

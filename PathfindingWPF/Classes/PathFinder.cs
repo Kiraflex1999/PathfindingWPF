@@ -41,7 +41,7 @@ namespace PathfindingWPF.Classes
         {
             if (node1.Point == node2.Point)
             {
-                throw new Exception("node1.Point == node2.Point in PathFinder.CalculateCost()");
+                return 0;
             }
 
             if (node1.Point.X == node2.Point.X)
@@ -67,7 +67,18 @@ namespace PathfindingWPF.Classes
 
         private List<Node> ReconstructPath(Node startNode, Node endNode)
         {
-            throw new NotImplementedException();
+            List<Node> path = new List<Node>();
+
+            Node start = startNode;
+            Node current = endNode;
+
+            while (start != current)
+            {
+                path.Add(current);
+                current = current.NextHop;
+            }
+            path.Add(current);
+            return path;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace PathfindingWPF.Classes
 
             while (openSet.Count > 0)
             {
-                Node currentNode = openSet.OrderBy(node => node.FCost).First();
+                Node currentNode = openSet.OrderBy(node => node.FCost).First(); //if multiple node with same FCost do something reminder!!!
 
                 if (currentNode == endNode)
                 {
@@ -43,6 +43,26 @@ namespace PathfindingWPF.Classes
         }
 
         private double CalculateGCost(Node currentNode, Node neighborNode)
+        {
+            if (currentNode.Point == neighborNode.Point)
+            {
+                throw new Exception("currentNode.Point == neighborNode.Point in PathFinder.CalculateGCost()");
+            }
+
+            if (currentNode.Point.X == neighborNode.Point.X)
+            {
+                return Math.Abs(currentNode.Point.Y - neighborNode.Point.Y);
+            }
+
+            if (currentNode.Point.Y == neighborNode.Point.Y)
+            {
+                return Math.Abs(currentNode.Point.X - neighborNode.Point.X);
+            }
+
+            return CalculateHypotenuse(currentNode, neighborNode);
+        }
+
+        private double CalculateHypotenuse(Node currentNode, Node neighborNode)
         {
             throw new NotImplementedException();
         }

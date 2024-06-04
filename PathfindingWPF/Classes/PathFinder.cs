@@ -1,4 +1,6 @@
 ﻿
+using System.Xml.Linq;
+
 namespace PathfindingWPF.Classes
 {
     internal class PathFinder
@@ -25,8 +27,8 @@ namespace PathfindingWPF.Classes
                     if (!closedSet.Contains(neighborNode))
                     {
                         neighborNode.NextHop = currentNode;
-                        neighborNode.GCost = CalculateCost(currentNode, neighborNode);
-                        neighborNode.HCost = CalculateCost(neighborNode, endNode);
+                        neighborNode.GCost = CalculateGCost(currentNode, neighborNode);
+                        neighborNode.HCost = CalculateHCost(neighborNode, endNode);
                         neighborNode.FCost = neighborNode.GCost + neighborNode.HCost;
 
                         openSet.Add(neighborNode);
@@ -37,24 +39,43 @@ namespace PathfindingWPF.Classes
             return null;
         }
 
-        private double CalculateCost(Node node1, Node node2)
+        private double CalculateHCost(Node currentNode, Node endNode)
         {
-            if (node1.Point == node2.Point)
+            if (currentNode.Point == endNode.Point)
             {
                 return 0;
             }
 
-            if (node1.Point.X == node2.Point.X)
+            if (currentNode.Point.X == endNode.Point.X)
             {
-                return Math.Abs(node1.Point.Y - node2.Point.Y);
+                return Math.Abs(currentNode.Point.Y - endNode.Point.Y);
             }
 
-            if (node1.Point.Y == node2.Point.Y)
+            if (currentNode.Point.Y == endNode.Point.Y)
             {
-                return Math.Abs(node1.Point.X - node2.Point.X);
+                return Math.Abs(currentNode.Point.X - endNode.Point.X);
+            }
+            return CalculateHypotenuse(currentNode, endNode);
+        }
+
+        private double CalculateGCost(Node currentNode, Node neighborNode)
+        {
+            if (currentNode.Point == neighborNode.Point)
+            {
+                throw new Exception("CalculateGCost");
             }
 
-            return CalculateHypotenuse(node1, node2);
+            if (currentNode.Point.X == neighborNode.Point.X)
+            {
+                return Math.Abs(currentNode.Point.Y - neighborNode.Point.Y + currentNode.GCost);
+            }
+
+            if (currentNode.Point.Y == neighborNode.Point.Y)
+            {
+                return Math.Abs(currentNode.Point.X - neighborNode.Point.X + currentNode.GCost);
+            }
+
+            return CalculateHypotenuse(currentNode, neighborNode) + currentNode.GCost;
         }
 
         private double CalculateHypotenuse(Node node1, Node node2)

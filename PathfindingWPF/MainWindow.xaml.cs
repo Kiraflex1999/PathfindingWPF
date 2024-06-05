@@ -1,6 +1,8 @@
 ﻿using PathfindingWPF.Classes;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -50,7 +52,7 @@ namespace PathfindingWPF
 
             List<Node> nodes = new List<Node>
             {
-                node1 , node2 , node3 , node4 , node5 , node6 , node7 , node8
+                node1, node2, node3, node4, node5, node6, node7, node8
             };
 
             return nodes;
@@ -96,35 +98,21 @@ namespace PathfindingWPF
             myCanvas.Children.Add(path);
         }
 
-        //private void DrawPathOnCanvas()
-        //{
-        //    Path myPath = new Path
-        //    {
-        //        Stroke = Brushes.Black,
-        //        StrokeThickness = 2,
-        //        Fill = Brushes.LightBlue,
-        //    };
+        private void myCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var canvas = sender as Canvas;
+            Point mousePosition = e.GetPosition(canvas);
 
-        //    GeometryGroup geometryGroup = new GeometryGroup();
+            Path path = new Path
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+                Fill = Brushes.LightBlue,
+            };
 
-        //    RectangleGeometry rectangleGeometry = new RectangleGeometry(new Rect(50, 50, 150, 100));
-        //    geometryGroup.Children.Add(rectangleGeometry);
-
-        //    EllipseGeometry ellipseGeometry = new EllipseGeometry(new Point(300, 300), 10, 10);
-        //    geometryGroup.Children.Add(ellipseGeometry);
-
-        //    PathGeometry pathGeometry = new PathGeometry();
-        //    PathFigure pathFigure = new PathFigure { StartPoint = new Point(300, 300) };
-        //    pathFigure.Segments.Add(new LineSegment(new Point(400, 300), true));
-        //    pathFigure.Segments.Add(new LineSegment(new Point(400, 400), true));
-        //    pathFigure.Segments.Add(new LineSegment(new Point(300, 400), true));
-        //    pathFigure.Segments.Add(new LineSegment(new Point(300, 300), true));
-        //    pathGeometry.Figures.Add(pathFigure);
-        //    geometryGroup.Children.Add(pathGeometry);
-
-        //    myPath.Data = geometryGroup;
-
-        //    myCanvas.Children.Add(myPath);
-        //}
+            EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
+            path.Data = ellipseGeometry;
+            canvas.Children.Add(path);
+        }
     }
 }

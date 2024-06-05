@@ -1,7 +1,4 @@
-﻿
-using System.Xml.Linq;
-
-namespace PathfindingWPF.Classes
+﻿namespace PathfindingWPF.Classes
 {
     internal class PathFinder
     {

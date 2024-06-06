@@ -13,16 +13,18 @@ namespace PathfindingWPF
     /// </summary>
     public partial class MainWindow : Window
     {
+        private List<Node> _nodes;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            List<Node> nodes = TempNodesCreation();
+            _nodes = TempNodesCreation();
 
-            DrawPathOnCanvas(nodes);
+            DrawPathOnCanvas();
 
             PathFinder pathFinder = new PathFinder();
-            List<Node> path = pathFinder.Start(nodes[0], nodes[3]);   //node id -1 == index
+            List<Node> path = pathFinder.Start(_nodes[0], _nodes[3]);   //node id -1 == index
 
             foreach (Node node in path)
             {
@@ -41,14 +43,14 @@ namespace PathfindingWPF
             Node node7 = new Node(new Point(200, 600));
             Node node8 = new Node(new Point(600, 600));
 
-            node1.AddNeighbor(new List<Node> { node2, node5 });
-            node2.AddNeighbor(new List<Node> { node1, node3, node8 });
-            node3.AddNeighbor(new List<Node> { node2, node6, node4 });
-            node4.AddNeighbor(new List<Node> { node3, node6, node8 });
-            node5.AddNeighbor(new List<Node> { node1, node7 });
-            node6.AddNeighbor(new List<Node> { node3, node4, node8 });
-            node7.AddNeighbor(new List<Node> { node5, node8 });
-            node8.AddNeighbor(new List<Node> { node2, node4, node6, node7 });
+            node1.AddNeighborNode(new List<Node> { node2, node5 });
+            node2.AddNeighborNode(new List<Node> { node1, node3, node8 });
+            node3.AddNeighborNode(new List<Node> { node2, node6, node4 });
+            node4.AddNeighborNode(new List<Node> { node3, node6, node8 });
+            node5.AddNeighborNode(new List<Node> { node1, node7 });
+            node6.AddNeighborNode(new List<Node> { node3, node4, node8 });
+            node7.AddNeighborNode(new List<Node> { node5, node8 });
+            node8.AddNeighborNode(new List<Node> { node2, node4, node6, node7 });
 
             List<Node> nodes = new List<Node>
             {
@@ -58,7 +60,7 @@ namespace PathfindingWPF
             return nodes;
         }
 
-        private void DrawPathOnCanvas(List<Node> nodes)
+        private void DrawPathOnCanvas()
         {
             Path path = new Path
             {
@@ -69,7 +71,7 @@ namespace PathfindingWPF
 
             GeometryGroup geometryGroup = new GeometryGroup();
 
-            foreach (Node node in nodes)
+            foreach (Node node in _nodes)
             {
                 EllipseGeometry ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
                 geometryGroup.Children.Add(ellipseGeometry);
@@ -77,7 +79,7 @@ namespace PathfindingWPF
 
             HashSet<NodePath> lines = new HashSet<NodePath>();
 
-            foreach (Node node in nodes)
+            foreach (Node node in _nodes)
             {
                 foreach (Node neighbor in node.GetNeighborNodes())
                 {
@@ -103,6 +105,13 @@ namespace PathfindingWPF
             var canvas = sender as Canvas;
             Point mousePosition = e.GetPosition(canvas);
 
+            Canvas testCanvas = new Canvas();
+
+            foreach (Node node in _nodes)
+            {
+
+            }
+
             Path path = new Path
             {
                 Stroke = Brushes.Black,
@@ -113,6 +122,8 @@ namespace PathfindingWPF
             EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
             path.Data = ellipseGeometry;
             canvas.Children.Add(path);
+
+            _nodes.Add(new Node(mousePosition));
         }
     }
 }

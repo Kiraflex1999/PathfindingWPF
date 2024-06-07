@@ -40,7 +40,7 @@
                     {
                         neighborNode.NextHop = currentNode;
                         neighborNode.GCost = CalculateGCost(currentNode, neighborNode);
-                        neighborNode.HCost = CalculateHCost(neighborNode, endNode);
+                        neighborNode.HCost = CalculateHypotenuse(neighborNode, endNode);
                         neighborNode.FCost = neighborNode.GCost + neighborNode.HCost;
 
                         openSet.Add(neighborNode);
@@ -51,40 +51,11 @@
             return null;
         }
 
-        private double CalculateHCost(Node currentNode, Node endNode)
-        {
-            if (currentNode.Point == endNode.Point)
-            {
-                return 0;
-            }
-
-            if (currentNode.Point.X == endNode.Point.X)
-            {
-                return Math.Abs(currentNode.Point.Y - endNode.Point.Y);
-            }
-
-            if (currentNode.Point.Y == endNode.Point.Y)
-            {
-                return Math.Abs(currentNode.Point.X - endNode.Point.X);
-            }
-            return CalculateHypotenuse(currentNode, endNode);
-        }
-
         private double CalculateGCost(Node currentNode, Node neighborNode)
         {
             if (currentNode.Point == neighborNode.Point)
             {
                 throw new Exception("CalculateGCost");
-            }
-
-            if (currentNode.Point.X == neighborNode.Point.X)
-            {
-                return Math.Abs(currentNode.Point.Y - neighborNode.Point.Y) + currentNode.GCost;
-            }
-
-            if (currentNode.Point.Y == neighborNode.Point.Y)
-            {
-                return Math.Abs(currentNode.Point.X - neighborNode.Point.X) + currentNode.GCost;
             }
 
             return CalculateHypotenuse(currentNode, neighborNode) + currentNode.GCost;

@@ -105,13 +105,21 @@ namespace PathfindingWPF
             var canvas = sender as Canvas;
             Point mousePosition = e.GetPosition(canvas);
 
-            Canvas testCanvas = new Canvas();
-
             foreach (Node node in _nodes)
             {
-
+                if ((node.Point.X < mousePosition.X - 10 && node.Point.X > mousePosition.X + 10) || 
+                    (node.Point.Y < mousePosition.Y - 10 && node.Point.Y > mousePosition.Y + 10))
+                {
+                    return;
+                }
             }
 
+            canvas.Children.Add(CreateCircleNode(mousePosition));
+            _nodes.Add(new Node(mousePosition));
+        }
+
+        private UIElement CreateCircleNode(Point mousePosition)
+        {
             Path path = new Path
             {
                 Stroke = Brushes.Black,
@@ -121,9 +129,7 @@ namespace PathfindingWPF
 
             EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
             path.Data = ellipseGeometry;
-            canvas.Children.Add(path);
-
-            _nodes.Add(new Node(mousePosition));
+            return path;
         }
     }
 }

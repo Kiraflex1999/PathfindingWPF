@@ -143,7 +143,10 @@ namespace PathfindingWPF
             }
 
             RenderTargetBitmap renderTargetBitmap = new((int)size * 2, (int)size * 2, 96d, 96d, PixelFormats.Pbgra32);
+            testCanvas.Measure(new Size(size * 2, size * 2));
+
             renderTargetBitmap.Render(testCanvas);
+
 
             int stride = (int)testCanvas.ActualWidth * 4;
             int size1 = (int)testCanvas.ActualHeight * stride;

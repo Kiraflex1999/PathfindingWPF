@@ -104,6 +104,8 @@ namespace PathfindingWPF
 
         private void myCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            testCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
+
             var canvas = sender as Canvas;
             Point mousePosition = e.GetPosition(canvas);
 
@@ -141,6 +143,14 @@ namespace PathfindingWPF
                     testCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
+
+
+
+        }
+
+        private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
+        {
+            double size = 25;
 
             RenderTargetBitmap renderTargetBitmap = new((int)size * 2, (int)size * 2, 96d, 96d, PixelFormats.Pbgra32);
             testCanvas.Measure(new Size(size * 2, size * 2));

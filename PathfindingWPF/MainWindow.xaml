@@ -9,6 +9,16 @@
     <Grid>
         <Canvas Name="myCanvas"
                 MouseLeftButtonUp="myCanvas_MouseLeftButtonUp"
-                Background="White"/>
+                Background="White">
+            <Grid>
+                <Canvas Name="testCanvas"
+                        Height="50"
+                        MaxHeight="50"
+                        Width="50"
+                        MaxWidth="50"
+                        Background="Black"
+                        />
+            </Grid>
+        </Canvas>
     </Grid>
 </Window>

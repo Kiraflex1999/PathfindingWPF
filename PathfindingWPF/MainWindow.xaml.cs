@@ -143,9 +143,6 @@ namespace PathfindingWPF
                     testCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
-
-
-
         }
 
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)

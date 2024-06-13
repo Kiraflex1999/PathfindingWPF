@@ -8,11 +8,11 @@ namespace PathfindingWPF.Classes
         private List<Node> _neighborNodes { get; set; }
         public double Radius { get; set; } = 10;
 
-        public double GCost { get; set; }   //distance from starting node
-        public double HCost { get; set; }   //distance from end node
-        public double FCost { get; set; }   //GCost + HCost
+        public double CostFromStart { get; set; }
+        public double HeuristicCost {  get; set; }
+        public double FinalCost { get; set; }
 
-        public Node? NextHop { get; set; }
+        public Node? ParentNode { get; set; }
 
         public Node(Point point) 
         {
@@ -45,6 +45,21 @@ namespace PathfindingWPF.Classes
         public List<Node> GetNeighborNodes()
         {
             return _neighborNodes;
+        }
+
+        public void CalculateCosts(Node currentNode, Node endNode)
+        {
+            CostFromStart = CalculateHypotenuse(currentNode) + currentNode.CostFromStart;
+            HeuristicCost = CalculateHypotenuse(endNode);
+            FinalCost = CostFromStart + HeuristicCost;
+        }
+
+        private double CalculateHypotenuse(Node currentNode)
+        {
+            double x = Math.Abs(currentNode.Point.X - this.Point.X);
+            double y = Math.Abs(currentNode.Point.Y - this.Point.Y);
+
+            return Math.Sqrt(x * x + y * y);
         }
     }
 }

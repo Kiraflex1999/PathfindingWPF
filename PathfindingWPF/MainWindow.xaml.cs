@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace PathfindingWPF
@@ -83,6 +84,7 @@ namespace PathfindingWPF
             {
                 foreach (Node neighbor in node.GetNeighborNodes())
                 {
+                    //checks if a line between two nodes is in the hashset
                     if (lines.Where(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)).Count() < 1)
                     {
                         PathGeometry pathGeometry = new PathGeometry();
@@ -102,20 +104,71 @@ namespace PathfindingWPF
 
         private void myCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            testCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
+
             var canvas = sender as Canvas;
             Point mousePosition = e.GetPosition(canvas);
 
+            double size = 25;
+
+            testCanvas.Children.Clear();
+
+            testCanvas.Children.Add(CreateTestCircleNode(new Point(size - 1, size - 1)));
+
             foreach (Node node in _nodes)
             {
-                if ((node.Point.X < mousePosition.X - 10 && node.Point.X > mousePosition.X + 10) || 
-                    (node.Point.Y < mousePosition.Y - 10 && node.Point.Y > mousePosition.Y + 10))
+                double x = Math.Abs(node.Point.X - mousePosition.X);
+                double y = Math.Abs(node.Point.Y - mousePosition.Y);
+
+                if (x <= size && y <= size)
                 {
-                    return;
+                    if (node.Point.X - mousePosition.X < 0)
+                    {
+                        x = size + x;
+                    }
+                    else
+                    {
+                        x = size - x;
+                    }
+
+                    if (node.Point.Y - mousePosition.Y < 0)
+                    {
+                        y = size + y;
+                    }
+                    else
+                    {
+                        y = size - y;
+                    }
+
+                    testCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
+        }
 
-            canvas.Children.Add(CreateCircleNode(mousePosition));
-            _nodes.Add(new Node(mousePosition));
+        private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
+        {
+            double size = 25;
+
+            RenderTargetBitmap renderTargetBitmap = new((int)size * 2, (int)size * 2, 96d, 96d, PixelFormats.Pbgra32);
+            testCanvas.Measure(new Size(size * 2, size * 2));
+
+            renderTargetBitmap.Render(testCanvas);
+
+
+            int stride = (int)testCanvas.ActualWidth * 4;
+            int size1 = (int)testCanvas.ActualHeight * stride;
+            byte[] pixels = new byte[size1];
+
+            renderTargetBitmap.CopyPixels(pixels, stride, 0);
+
+            List<Color> colorList = new List<Color>();
+
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                colorList.Add(Color.FromArgb(pixels[i + 3], pixels[i + 2], pixels[i + 1], pixels[i]));
+            }
+
+            List<Color> colors = colorList.Where(x => x.R > 0).ToList();
         }
 
         private UIElement CreateCircleNode(Point mousePosition)
@@ -128,6 +181,20 @@ namespace PathfindingWPF
             };
 
             EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
+            path.Data = ellipseGeometry;
+            return path;
+        }
+
+        private UIElement CreateTestCircleNode(Point mousePosition)
+        {
+            Path path = new Path
+            {
+                //Stroke = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
+                StrokeThickness = 2,
+                Fill = new SolidColorBrush(Color.FromArgb(230, 255, 255, 255)),
+            };
+
+            EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 11, 11);
             path.Data = ellipseGeometry;
             return path;
         }

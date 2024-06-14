@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Canvas Name="myCanvas"
-                MouseLeftButtonUp="myCanvas_MouseLeftButtonUp"
+        <Canvas Name="MyCanvas"
+                MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
                 Background="White">
             <Grid>
-                <Canvas Name="testCanvas"
+                <Canvas Name="TestCanvas"
                         Height="50"
                         MaxHeight="50"
                         Width="50"

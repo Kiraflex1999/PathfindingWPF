@@ -16,8 +16,10 @@ namespace PathfindingWPF
     {
         private List<Node> _nodes;
         private List<Color> _whitePixelList;
+        private HashSet<NodePath> _lines = [];
         private Point _mouseLeftButtonUpPosition;
         private bool _mouseLeftButtonUpPressed;
+        private readonly double _halfTestCanvasSize = 25;
 
         public MainWindow()
         {
@@ -83,8 +85,6 @@ namespace PathfindingWPF
 
         private void DrawLinesOnCanvas()
         {
-            HashSet<NodePath> lines = [];
-
             Path path = new()
             {
                 Stroke = Brushes.Black,
@@ -92,6 +92,14 @@ namespace PathfindingWPF
                 Fill = Brushes.LightBlue,
             };
 
+            GeometryGroup geometryGroup = CreateLines();
+
+            path.Data = geometryGroup;
+            MyCanvas.Children.Add(path);
+        }
+
+        private GeometryGroup CreateLines()
+        {
             GeometryGroup geometryGroup = new();
 
             foreach (Node node in _nodes)
@@ -99,20 +107,19 @@ namespace PathfindingWPF
                 foreach (Node neighbor in node.GetNeighborNodes())
                 {
                     //checks if a line between two nodes is in the hashset
-                    if (!lines.Where(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)).Any())
+                    if (!_lines.Where(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)).Any())
                     {
                         PathGeometry pathGeometry = new();
                         PathFigure pathFigure = new() { StartPoint = node.Point };
                         pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                         pathGeometry.Figures.Add(pathFigure);
                         geometryGroup.Children.Add(pathGeometry);
-                        lines.Add(new NodePath(node, neighbor, pathGeometry));
+                        _lines.Add(new NodePath(node, neighbor, pathGeometry));
                     }
                 }
             }
 
-            path.Data = geometryGroup;
-            myCanvas.Children.Add(path);
+            return geometryGroup;
         }
 
         private void DrawNodesOnCanvas()
@@ -133,55 +140,53 @@ namespace PathfindingWPF
             }
 
             path.Data = geometryGroup;
-            myCanvas.Children.Add(path);
+            MyCanvas.Children.Add(path);
         }
 
-        private void myCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            testCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
+            TestCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
 
             var canvas = sender as Canvas;
             _mouseLeftButtonUpPosition = e.GetPosition(canvas);
 
-            double size = 25;
+            TestCanvas.Children.Clear();
 
-            testCanvas.Children.Clear();
+            TestCanvas.Children.Add(CreateTestCircleNode(new Point(_halfTestCanvasSize - 1, _halfTestCanvasSize - 1)));
 
-            testCanvas.Children.Add(CreateTestCircleNode(new Point(size - 1, size - 1)));
-
-            TestCanvasAddCloseNodes(size);
+            TestCanvasAddCloseNodes();
 
             _mouseLeftButtonUpPressed = true;
         }
 
-        private void TestCanvasAddCloseNodes(double size)
+        private void TestCanvasAddCloseNodes()
         {
             foreach (Node node in _nodes)
             {
                 double x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
                 double y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
 
-                if (x <= size && y <= size)
+                if (x <= _halfTestCanvasSize && y <= _halfTestCanvasSize)
                 {
                     if (node.Point.X - _mouseLeftButtonUpPosition.X < 0)
                     {
-                        x = size + x;
+                        x = _halfTestCanvasSize - x;
                     }
                     else
                     {
-                        x = size - x;
+                        x = _halfTestCanvasSize + x;
                     }
 
                     if (node.Point.Y - _mouseLeftButtonUpPosition.Y < 0)
                     {
-                        y = size + y;
+                        y = _halfTestCanvasSize - y;
                     }
                     else
                     {
-                        y = size - y;
+                        y = _halfTestCanvasSize + y;
                     }
 
-                    testCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
+                    TestCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
         }
@@ -198,8 +203,8 @@ namespace PathfindingWPF
 
             if (_whitePixelList.Count == 0 && _mouseLeftButtonUpPressed)
             {
-                testCanvas.Children.Clear();
-                myCanvas.Children.Add(CreateCircleNode(_mouseLeftButtonUpPosition));
+                TestCanvas.Children.Clear();
+                MyCanvas.Children.Add(CreateCircleNode(_mouseLeftButtonUpPosition));
                 _nodes.Add(new Node(_mouseLeftButtonUpPosition));
                 _mouseLeftButtonUpPressed = false;
             }
@@ -216,16 +221,14 @@ namespace PathfindingWPF
 
         private List<Color> GetPixelListFromTestCanvas()
         {
-            double size = 25;
+            RenderTargetBitmap renderTargetBitmap = new((int)_halfTestCanvasSize * 2, (int)_halfTestCanvasSize * 2, 96d, 96d, PixelFormats.Pbgra32);
+            TestCanvas.Measure(new Size(_halfTestCanvasSize * 2, _halfTestCanvasSize * 2));
 
-            RenderTargetBitmap renderTargetBitmap = new((int)size * 2, (int)size * 2, 96d, 96d, PixelFormats.Pbgra32);
-            testCanvas.Measure(new Size(size * 2, size * 2));
+            renderTargetBitmap.Render(TestCanvas);
 
-            renderTargetBitmap.Render(testCanvas);
-
-            int stride = (int)testCanvas.ActualWidth * 4;
-            int size1 = (int)testCanvas.ActualHeight * stride;
-            byte[] pixels = new byte[size1];
+            int stride = (int)TestCanvas.ActualWidth * 4;
+            int arraySize = (int)TestCanvas.ActualHeight * stride;
+            byte[] pixels = new byte[arraySize];
 
             renderTargetBitmap.CopyPixels(pixels, stride, 0);
 

@@ -208,10 +208,6 @@ namespace PathfindingWPF
                 _nodes.Add(new Node(_mouseLeftButtonUpPosition));
                 _mouseLeftButtonUpPressed = false;
             }
-            else
-            {
-
-            }
         }
 
         private static List<Color> GetWhitePixelListFromPixelList(List<Color> pixelList)

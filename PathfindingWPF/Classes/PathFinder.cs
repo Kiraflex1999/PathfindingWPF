@@ -2,10 +2,10 @@
 {
     internal class PathFinder
     {
-        private HashSet<Node> _closedSet = new();
-        private List<Node> _openSet = new();
+        private HashSet<Node> _closedSet = [];
+        private List<Node> _openSet = [];
 
-        public List<Node>? Start(Node startNode, Node endNode)
+        public List<Node> Start(Node startNode, Node endNode)
         {
             _openSet.Add(startNode);
 
@@ -24,7 +24,7 @@
                 CalculateNeighborNodeCosts(currentNode, endNode);
             }
 
-            return null;
+            return [];
         }
 
         private void CalculateNeighborNodeCosts(Node currentNode, Node endNode)

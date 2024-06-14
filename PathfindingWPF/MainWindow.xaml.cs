@@ -15,8 +15,8 @@ namespace PathfindingWPF
     public partial class MainWindow : Window
     {
         private List<Node> _nodes;
-        private List<Color> _colors;
-        private Point _mouseLeftButtonUp;
+        private List<Color> _whitePixelList;
+        private Point _mouseLeftButtonUpPosition;
         private bool _mouseLeftButtonUpPressed;
 
         public MainWindow()
@@ -24,9 +24,9 @@ namespace PathfindingWPF
             InitializeComponent();
 
             _nodes = TempNodesCreation();
-            _colors = new();
+            _whitePixelList = new();
 
-            DrawPathOnCanvas();
+            DrawMapOnCanvas();
 
             PathFinder pathFinder = new PathFinder();
             List<Node> path = pathFinder.Start(_nodes[0], _nodes[3]);   //node id -1 == index
@@ -65,8 +65,17 @@ namespace PathfindingWPF
             return nodes;
         }
 
-        private void DrawPathOnCanvas()
+        private void DrawMapOnCanvas()
         {
+            DrawNodesOnCanvas();
+
+            DrawLinesOnCanvas();
+        }
+
+        private void DrawLinesOnCanvas()
+        {
+            HashSet<NodePath> lines = new HashSet<NodePath>();
+
             Path path = new Path
             {
                 Stroke = Brushes.Black,
@@ -75,14 +84,6 @@ namespace PathfindingWPF
             };
 
             GeometryGroup geometryGroup = new GeometryGroup();
-
-            foreach (Node node in _nodes)
-            {
-                EllipseGeometry ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
-                geometryGroup.Children.Add(ellipseGeometry);
-            }
-
-            HashSet<NodePath> lines = new HashSet<NodePath>();
 
             foreach (Node node in _nodes)
             {
@@ -102,7 +103,27 @@ namespace PathfindingWPF
             }
 
             path.Data = geometryGroup;
+            myCanvas.Children.Add(path);
+        }
 
+        private void DrawNodesOnCanvas()
+        {
+            Path path = new Path
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+                Fill = Brushes.LightBlue,
+            };
+
+            GeometryGroup geometryGroup = new GeometryGroup();
+
+            foreach (Node node in _nodes)
+            {
+                EllipseGeometry ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
+                geometryGroup.Children.Add(ellipseGeometry);
+            }
+
+            path.Data = geometryGroup;
             myCanvas.Children.Add(path);
         }
 
@@ -111,7 +132,7 @@ namespace PathfindingWPF
             testCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
 
             var canvas = sender as Canvas;
-            _mouseLeftButtonUp = e.GetPosition(canvas);
+            _mouseLeftButtonUpPosition = e.GetPosition(canvas);
 
             double size = 25;
 
@@ -119,14 +140,21 @@ namespace PathfindingWPF
 
             testCanvas.Children.Add(CreateTestCircleNode(new Point(size - 1, size - 1)));
 
+            TestCanvasAddCloseNodes(size);
+
+            _mouseLeftButtonUpPressed = true;
+        }
+
+        private void TestCanvasAddCloseNodes(double size)
+        {
             foreach (Node node in _nodes)
             {
-                double x = Math.Abs(node.Point.X - _mouseLeftButtonUp.X);
-                double y = Math.Abs(node.Point.Y - _mouseLeftButtonUp.Y);
+                double x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
+                double y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
 
                 if (x <= size && y <= size)
                 {
-                    if (node.Point.X - _mouseLeftButtonUp.X < 0)
+                    if (node.Point.X - _mouseLeftButtonUpPosition.X < 0)
                     {
                         x = size + x;
                     }
@@ -135,7 +163,7 @@ namespace PathfindingWPF
                         x = size - x;
                     }
 
-                    if (node.Point.Y - _mouseLeftButtonUp.Y < 0)
+                    if (node.Point.Y - _mouseLeftButtonUpPosition.Y < 0)
                     {
                         y = size + y;
                     }
@@ -147,10 +175,31 @@ namespace PathfindingWPF
                     testCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
-            _mouseLeftButtonUpPressed = true;
         }
 
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
+        {
+            var pixelList = GetPixelListFromTestCanvas();
+
+            _whitePixelList = GetWhitePixelListFromPixelList(pixelList);
+
+            Debug.WriteLine("Amount of white pixels: " + _whitePixelList.Count);
+
+            if (_whitePixelList.Count == 0 && _mouseLeftButtonUpPressed)
+            {
+                testCanvas.Children.Clear();
+                myCanvas.Children.Add(CreateCircleNode(_mouseLeftButtonUpPosition));
+                _nodes.Add(new Node(_mouseLeftButtonUpPosition));
+                _mouseLeftButtonUpPressed = false;
+            }
+        }
+
+        private List<Color> GetWhitePixelListFromPixelList(List<Color> pixelList)
+        {
+            return pixelList.Where(x => x.R == 0xFF).ToList();
+        }
+
+        private List<Color> GetPixelListFromTestCanvas()
         {
             double size = 25;
 
@@ -158,7 +207,6 @@ namespace PathfindingWPF
             testCanvas.Measure(new Size(size * 2, size * 2));
 
             renderTargetBitmap.Render(testCanvas);
-
 
             int stride = (int)testCanvas.ActualWidth * 4;
             int size1 = (int)testCanvas.ActualHeight * stride;
@@ -173,16 +221,7 @@ namespace PathfindingWPF
                 colorList.Add(Color.FromArgb(pixels[i + 3], pixels[i + 2], pixels[i + 1], pixels[i]));
             }
 
-            _colors = colorList.Where(x => x.R == 0xFF).ToList();
-
-            Debug.WriteLine("Amount of white pixels: " + _colors.Count);
-
-            if (_colors.Count == 0 && _mouseLeftButtonUpPressed)
-            {
-                testCanvas.Children.Clear();
-                myCanvas.Children.Add(CreateCircleNode(_mouseLeftButtonUp));
-                _mouseLeftButtonUpPressed = false;
-            }
+            return colorList;
         }
 
         private UIElement CreateCircleNode(Point mousePosition)
@@ -208,7 +247,7 @@ namespace PathfindingWPF
                 Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)),
             };
 
-            EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 11, 11);
+            EllipseGeometry ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);
             path.Data = ellipseGeometry;
             return path;
         }

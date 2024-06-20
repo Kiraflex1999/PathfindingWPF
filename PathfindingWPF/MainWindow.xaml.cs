@@ -18,6 +18,10 @@ namespace PathfindingWPF
         private bool _mouseLeftButtonUpPressed;
         private readonly double _halfTestCanvasSize = 25;
 
+        // Variables to store selected nodes for pathfinding
+        private Node _firstSelectedNode;
+        private Node _secondSelectedNode;
+
         // Constructor for the MainWindow class
         public MainWindow()
         {
@@ -148,6 +152,41 @@ namespace PathfindingWPF
 
             TestCanvasAddCloseNodes();
             _mouseLeftButtonUpPressed = true;
+
+            // Handle node selection for pathfinding
+            Node clickedNode = GetClickedNode(_mouseLeftButtonUpPosition);
+            if (clickedNode != null)
+            {
+                if (_firstSelectedNode == null)
+                {
+                    _firstSelectedNode = clickedNode;
+                }
+                else if (_secondSelectedNode == null)
+                {
+                    _secondSelectedNode = clickedNode;
+                    UsePathFinder(_firstSelectedNode, _secondSelectedNode);
+                    // Reset after finding the path
+                    _firstSelectedNode = null;
+                    _secondSelectedNode = null;
+                }
+            }
+        }
+
+        private Node GetClickedNode(Point clickPosition)
+        {
+            foreach (var node in _nodes)
+            {
+                // Calculate the distance from the click position to the center of the node
+                double distance = Math.Sqrt(Math.Pow(clickPosition.X - node.Point.X, 2) + Math.Pow(clickPosition.Y - node.Point.Y, 2));
+
+                // If the distance is less than or equal to the node's radius, consider it a click on that node
+                if (distance <= node.Radius)
+                {
+                    return node;
+                }
+            }
+
+            return null; // Return null if no node was clicked
         }
 
         // Method to add nodes close to the mouse click position to the test canvas

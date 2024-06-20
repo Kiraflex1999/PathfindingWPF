@@ -11,17 +11,15 @@
         <!-- Main canvas where user interactions and drawings happen -->
         <Canvas Name="MyCanvas"
                 MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
-                Background="White">
-            <!-- Nested grid to organize inner elements within the canvas -->
-            <Grid>
-                <!-- Inner canvas element with specific size and background color -->
-                <Canvas Name="TestCanvas"
-                        Height="50"
-                        MaxHeight="50"
-                        Width="50"
-                        MaxWidth="50"
-                        Background="Black" />
-            </Grid>
-        </Canvas>
+                Background="White"/>
+        <!-- Secondary canvas for testing purposes -->
+        <Canvas Name="TestCanvas"
+                Height="50"
+                MaxHeight="50"
+                Width="50"
+                MaxWidth="50"
+                Background="Black" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top"/>
     </Grid>
 </Window>

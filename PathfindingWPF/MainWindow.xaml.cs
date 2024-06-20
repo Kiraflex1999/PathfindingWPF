@@ -9,14 +9,11 @@ using System.Windows.Shapes;
 
 namespace PathfindingWPF
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private List<Node> _nodes;
+        private readonly List<Node> _nodes;
         private List<Color> _whitePixelList;
-        private HashSet<NodePath> _lines = [];
+        private readonly HashSet<NodePath> _lines = new();
         private Point _mouseLeftButtonUpPosition;
         private bool _mouseLeftButtonUpPressed;
         private readonly double _halfTestCanvasSize = 25;
@@ -25,14 +22,10 @@ namespace PathfindingWPF
         {
             InitializeComponent();
 
-            _nodes = [];
-            _whitePixelList = [];
-
-            //_nodes = TempNodesCreation();
+            _nodes = TempNodesCreation();
 
             DrawMapOnCanvas();
-
-            //UsePathFinder();
+            UsePathFinder(_nodes[0], _nodes[3]);
         }
 
         private void UsePathFinder(Node start, Node end)
@@ -50,67 +43,59 @@ namespace PathfindingWPF
 
         private List<Node> TempNodesCreation()
         {
-            Node node1 = new(new Point(200, 200));
-            Node node2 = new(new Point(600, 200));
-            Node node3 = new(new Point(800, 400));
-            Node node4 = new(new Point(1000, 800));
-            Node node5 = new(new Point(400, 400));
-            Node node6 = new(new Point(700, 500));
-            Node node7 = new(new Point(200, 600));
-            Node node8 = new(new Point(600, 600));
+            var node1 = new Node(new Point(200, 200));
+            var node2 = new Node(new Point(600, 200));
+            var node3 = new Node(new Point(800, 400));
+            var node4 = new Node(new Point(1000, 800));
+            var node5 = new Node(new Point(400, 400));
+            var node6 = new Node(new Point(700, 500));
+            var node7 = new Node(new Point(200, 600));
+            var node8 = new Node(new Point(600, 600));
 
-            node1.AddNeighborNode([node2, node5]);
-            node2.AddNeighborNode([node1, node3, node8]);
-            node3.AddNeighborNode([node2, node6, node4]);
-            node4.AddNeighborNode([node3, node6, node8]);
-            node5.AddNeighborNode([node1, node7]);
-            node6.AddNeighborNode([node3, node4, node8]);
-            node7.AddNeighborNode([node5, node8]);
-            node8.AddNeighborNode([node2, node4, node6, node7]);
+            node1.AddNeighborNode(new List<Node> { node2, node5 });
+            node2.AddNeighborNode(new List<Node> { node1, node3, node8 });
+            node3.AddNeighborNode(new List<Node> { node2, node6, node4 });
+            node4.AddNeighborNode(new List<Node> { node3, node6, node8 });
+            node5.AddNeighborNode(new List<Node> { node1, node7 });
+            node6.AddNeighborNode(new List<Node> { node3, node4, node8 });
+            node7.AddNeighborNode(new List<Node> { node5, node8 });
+            node8.AddNeighborNode(new List<Node> { node2, node4, node6, node7 });
 
-            List<Node> nodes =
-            [
-                node1, node2, node3, node4, node5, node6, node7, node8
-            ];
-
-            return nodes;
+            return new List<Node> { node1, node2, node3, node4, node5, node6, node7, node8 };
         }
 
         private void DrawMapOnCanvas()
         {
             DrawNodesOnCanvas();
-
             DrawLinesOnCanvas();
         }
 
         private void DrawLinesOnCanvas()
         {
-            Path path = new()
+            var path = new Path
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
                 Fill = Brushes.LightBlue,
             };
 
-            GeometryGroup geometryGroup = CreateLines();
-
+            var geometryGroup = CreateLines();
             path.Data = geometryGroup;
             MyCanvas.Children.Add(path);
         }
 
         private GeometryGroup CreateLines()
         {
-            GeometryGroup geometryGroup = new();
+            var geometryGroup = new GeometryGroup();
 
-            foreach (Node node in _nodes)
+            foreach (var node in _nodes)
             {
-                foreach (Node neighbor in node.GetNeighborNodes())
+                foreach (var neighbor in node.GetNeighborNodes())
                 {
-                    //checks if a line between two nodes is in the hashset
-                    if (!_lines.Where(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)).Any())
+                    if (!_lines.Any(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)))
                     {
-                        PathGeometry pathGeometry = new();
-                        PathFigure pathFigure = new() { StartPoint = node.Point };
+                        var pathGeometry = new PathGeometry();
+                        var pathFigure = new PathFigure { StartPoint = node.Point };
                         pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                         pathGeometry.Figures.Add(pathFigure);
                         geometryGroup.Children.Add(pathGeometry);
@@ -124,18 +109,18 @@ namespace PathfindingWPF
 
         private void DrawNodesOnCanvas()
         {
-            Path path = new()
+            var path = new Path
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
                 Fill = Brushes.LightBlue,
             };
 
-            GeometryGroup geometryGroup = new();
+            var geometryGroup = new GeometryGroup();
 
-            foreach (Node node in _nodes)
+            foreach (var node in _nodes)
             {
-                EllipseGeometry ellipseGeometry = new(node.Point, node.Radius, node.Radius);
+                var ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
                 geometryGroup.Children.Add(ellipseGeometry);
             }
 
@@ -147,44 +132,26 @@ namespace PathfindingWPF
         {
             TestCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
 
-            var canvas = sender as Canvas;
-            _mouseLeftButtonUpPosition = e.GetPosition(canvas);
+            _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
 
             TestCanvas.Children.Clear();
-
             TestCanvas.Children.Add(CreateTestCircleNode(new Point(_halfTestCanvasSize - 1, _halfTestCanvasSize - 1)));
 
             TestCanvasAddCloseNodes();
-
             _mouseLeftButtonUpPressed = true;
         }
 
         private void TestCanvasAddCloseNodes()
         {
-            foreach (Node node in _nodes)
+            foreach (var node in _nodes)
             {
-                double x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
-                double y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
+                var x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
+                var y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
 
                 if (x <= _halfTestCanvasSize && y <= _halfTestCanvasSize)
                 {
-                    if (node.Point.X - _mouseLeftButtonUpPosition.X < 0)
-                    {
-                        x = _halfTestCanvasSize - x;
-                    }
-                    else
-                    {
-                        x = _halfTestCanvasSize + x;
-                    }
-
-                    if (node.Point.Y - _mouseLeftButtonUpPosition.Y < 0)
-                    {
-                        y = _halfTestCanvasSize - y;
-                    }
-                    else
-                    {
-                        y = _halfTestCanvasSize + y;
-                    }
+                    x = node.Point.X - _mouseLeftButtonUpPosition.X < 0 ? _halfTestCanvasSize - x : _halfTestCanvasSize + x;
+                    y = node.Point.Y - _mouseLeftButtonUpPosition.Y < 0 ? _halfTestCanvasSize - y : _halfTestCanvasSize + y;
 
                     TestCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
@@ -194,7 +161,6 @@ namespace PathfindingWPF
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
         {
             var pixelList = GetPixelListFromTestCanvas();
-
             _whitePixelList = GetWhitePixelListFromPixelList(pixelList);
 
 #if DEBUG
@@ -212,23 +178,21 @@ namespace PathfindingWPF
 
         private static List<Color> GetWhitePixelListFromPixelList(List<Color> pixelList)
         {
-            return pixelList.Where(x => x.R == 0xFF && x.G == 0xFF && x.B == 0xFF).ToList();
+            return pixelList.Where(color => color.R == 0xFF && color.G == 0xFF && color.B == 0xFF).ToList();
         }
 
         private List<Color> GetPixelListFromTestCanvas()
         {
-            RenderTargetBitmap renderTargetBitmap = new((int)_halfTestCanvasSize * 2, (int)_halfTestCanvasSize * 2, 96d, 96d, PixelFormats.Pbgra32);
+            var renderTargetBitmap = new RenderTargetBitmap((int)_halfTestCanvasSize * 2, (int)_halfTestCanvasSize * 2, 96d, 96d, PixelFormats.Pbgra32);
             TestCanvas.Measure(new Size(_halfTestCanvasSize * 2, _halfTestCanvasSize * 2));
-
             renderTargetBitmap.Render(TestCanvas);
 
-            int stride = (int)TestCanvas.ActualWidth * 4;
-            int arraySize = (int)TestCanvas.ActualHeight * stride;
-            byte[] pixels = new byte[arraySize];
-
+            var stride = (int)TestCanvas.ActualWidth * 4;
+            var arraySize = (int)TestCanvas.ActualHeight * stride;
+            var pixels = new byte[arraySize];
             renderTargetBitmap.CopyPixels(pixels, stride, 0);
 
-            List<Color> colorList = [];
+            var colorList = new List<Color>();
 
             for (int i = 0; i < pixels.Length; i += 4)
             {
@@ -240,28 +204,27 @@ namespace PathfindingWPF
 
         private static Path CreateCircleNode(Point mousePosition)
         {
-            Path path = new()
+            var path = new Path
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
                 Fill = Brushes.LightBlue,
             };
 
-            EllipseGeometry ellipseGeometry = new(mousePosition, 10, 10);
+            var ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
             path.Data = ellipseGeometry;
             return path;
         }
 
         private static Path CreateTestCircleNode(Point mousePosition)
         {
-            Path path = new()
+            var path = new Path
             {
-                //Stroke = new SolidColorBrush(Color.FromArgb(128, 255, 255, 255)),
                 StrokeThickness = 2,
                 Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)),
             };
 
-            EllipseGeometry ellipseGeometry = new(mousePosition, 12, 12);
+            var ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);
             path.Data = ellipseGeometry;
             return path;
         }

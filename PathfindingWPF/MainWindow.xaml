@@ -6,18 +6,21 @@
         xmlns:local="clr-namespace:PathfindingWPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <!-- Main container for the window layout -->
     <Grid>
+        <!-- Main canvas where user interactions and drawings happen -->
         <Canvas Name="MyCanvas"
                 MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
                 Background="White">
+            <!-- Nested grid to organize inner elements within the canvas -->
             <Grid>
+                <!-- Inner canvas element with specific size and background color -->
                 <Canvas Name="TestCanvas"
                         Height="50"
                         MaxHeight="50"
                         Width="50"
                         MaxWidth="50"
-                        Background="Black"
-                        />
+                        Background="Black" />
             </Grid>
         </Canvas>
     </Grid>

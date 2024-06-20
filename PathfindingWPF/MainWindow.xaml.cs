@@ -6,39 +6,44 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PathfindingWPF
 {
     public partial class MainWindow : Window
     {
-        private readonly List<Node> _nodes;
-        private List<Color> _whitePixelList;
-        private readonly HashSet<NodePath> _lines = new();
-        private Point _mouseLeftButtonUpPosition;
-        private bool _mouseLeftButtonUpPressed;
-        private readonly double _halfTestCanvasSize = 25;
+        private readonly List<Node> _nodes;               // List of nodes representing points on the map
+        private List<Color> _whitePixelList;              // List of white pixels used in image processing
+        private readonly HashSet<NodePath> _lines = new(); // Set of lines (paths) between nodes
+        private Point _mouseLeftButtonUpPosition;         // Position of the mouse when left button is released
+        private bool _mouseLeftButtonUpPressed;           // Flag indicating if left mouse button is pressed
+        private readonly double _halfTestCanvasSize = 25; // Half size of the test canvas for node creation
 
         // Variables to store selected nodes for pathfinding
-        private Node _firstSelectedNode;
-        private Node _secondSelectedNode;
+        private Node? _firstSelectedNode;                 // First node selected for pathfinding
+        private Node? _secondSelectedNode;                // Second node selected for pathfinding
 
         // Constructor for the MainWindow class
         public MainWindow()
         {
             InitializeComponent();
 
+            // Initialize nodes and draw the map
             _nodes = TempNodesCreation();
-
             DrawMapOnCanvas();
+
+            // Example usage of pathfinding algorithm between nodes
             UsePathFinder(_nodes[0], _nodes[3]);
         }
 
         // Method to find and display the path between two nodes using a pathfinding algorithm
         private void UsePathFinder(Node start, Node end)
         {
-            PathFinder pathFinder = new();
+            PathFinder pathFinder = new PathFinder();
             List<Node> path = pathFinder.Start(start, end);
 
+            // Output the path nodes to debug console
 #if DEBUG
             foreach (Node node in path)
             {
@@ -50,6 +55,7 @@ namespace PathfindingWPF
         // Temporary method to create and set up nodes and their connections
         private List<Node> TempNodesCreation()
         {
+            // Create nodes with specific positions
             var node1 = new Node(new Point(200, 200));
             var node2 = new Node(new Point(600, 200));
             var node3 = new Node(new Point(800, 400));
@@ -59,6 +65,7 @@ namespace PathfindingWPF
             var node7 = new Node(new Point(200, 600));
             var node8 = new Node(new Point(600, 600));
 
+            // Define neighbor relationships between nodes
             node1.AddNeighborNode(new List<Node> { node2, node5 });
             node2.AddNeighborNode(new List<Node> { node1, node3, node8 });
             node3.AddNeighborNode(new List<Node> { node2, node6, node4 });
@@ -81,6 +88,7 @@ namespace PathfindingWPF
         // Method to draw lines between nodes on the canvas
         private void DrawLinesOnCanvas()
         {
+            // Create a path for drawing lines
             var path = new Path
             {
                 Stroke = Brushes.Black,
@@ -88,6 +96,7 @@ namespace PathfindingWPF
                 Fill = Brushes.LightBlue,
             };
 
+            // Create geometry group for holding the line segments
             var geometryGroup = CreateLines();
             path.Data = geometryGroup;
             MyCanvas.Children.Add(path);
@@ -98,6 +107,7 @@ namespace PathfindingWPF
         {
             var geometryGroup = new GeometryGroup();
 
+            // Iterate through each node to draw lines to its neighbors
             foreach (var node in _nodes)
             {
                 foreach (var neighbor in node.GetNeighborNodes())
@@ -105,6 +115,7 @@ namespace PathfindingWPF
                     // Check if the line between these nodes already exists
                     if (!_lines.Any(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)))
                     {
+                        // Create a line segment between node and its neighbor
                         var pathGeometry = new PathGeometry();
                         var pathFigure = new PathFigure { StartPoint = node.Point };
                         pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
@@ -121,6 +132,7 @@ namespace PathfindingWPF
         // Method to draw nodes on the canvas
         private void DrawNodesOnCanvas()
         {
+            // Create a path for drawing nodes
             var path = new Path
             {
                 Stroke = Brushes.Black,
@@ -128,14 +140,17 @@ namespace PathfindingWPF
                 Fill = Brushes.LightBlue,
             };
 
+            // Create geometry group for holding the node shapes
             var geometryGroup = new GeometryGroup();
 
+            // Add ellipse geometries for each node to the geometry group
             foreach (var node in _nodes)
             {
                 var ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
                 geometryGroup.Children.Add(ellipseGeometry);
             }
 
+            // Assign the geometry group to the path and add it to canvas
             path.Data = geometryGroup;
             MyCanvas.Children.Add(path);
         }
@@ -143,18 +158,22 @@ namespace PathfindingWPF
         // Event handler for when the left mouse button is released on the canvas
         private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            // Subscribe to layout update event for test canvas
             TestCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
 
+            // Get position of mouse when left button is released
             _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
 
+            // Clear children of test canvas and add a test circle node
             TestCanvas.Children.Clear();
             TestCanvas.Children.Add(CreateTestCircleNode(new Point(_halfTestCanvasSize - 1, _halfTestCanvasSize - 1)));
 
+            // Add nodes close to mouse click position to test canvas
             TestCanvasAddCloseNodes();
             _mouseLeftButtonUpPressed = true;
 
             // Handle node selection for pathfinding
-            Node clickedNode = GetClickedNode(_mouseLeftButtonUpPosition);
+            Node? clickedNode = GetClickedNode(_mouseLeftButtonUpPosition);
             if (clickedNode != null)
             {
                 if (_firstSelectedNode == null)
@@ -172,21 +191,22 @@ namespace PathfindingWPF
             }
         }
 
-        private Node GetClickedNode(Point clickPosition)
+        // Method to determine if a node was clicked based on click position
+        private Node? GetClickedNode(Point clickPosition)
         {
             foreach (var node in _nodes)
             {
-                // Calculate the distance from the click position to the center of the node
+                // Calculate distance from click position to node center
                 double distance = Math.Sqrt(Math.Pow(clickPosition.X - node.Point.X, 2) + Math.Pow(clickPosition.Y - node.Point.Y, 2));
 
-                // If the distance is less than or equal to the node's radius, consider it a click on that node
+                // Consider it a click if within node radius
                 if (distance <= node.Radius)
                 {
                     return node;
                 }
             }
 
-            return null; // Return null if no node was clicked
+            return null; // No node clicked
         }
 
         // Method to add nodes close to the mouse click position to the test canvas
@@ -194,29 +214,37 @@ namespace PathfindingWPF
         {
             foreach (var node in _nodes)
             {
+                // Calculate the absolute distance between the node and the mouse click position
                 var x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
                 var y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
 
+                // Check if the node is within the halfTestCanvasSize range from the click position
                 if (x <= _halfTestCanvasSize && y <= _halfTestCanvasSize)
                 {
+                    // Adjust the position to ensure the node is within the test canvas bounds
                     x = node.Point.X - _mouseLeftButtonUpPosition.X < 0 ? _halfTestCanvasSize - x : _halfTestCanvasSize + x;
                     y = node.Point.Y - _mouseLeftButtonUpPosition.Y < 0 ? _halfTestCanvasSize - y : _halfTestCanvasSize + y;
 
+                    // Create a test circle node at the adjusted position and add it to the test canvas
                     TestCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
                 }
             }
         }
 
+
         // Event handler for when the layout of the test canvas is updated
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
         {
+            // Get list of pixels from test canvas and filter for white pixels
             var pixelList = GetPixelListFromTestCanvas();
             _whitePixelList = GetWhitePixelListFromPixelList(pixelList);
 
+            // Output amount of white pixels to debug console
 #if DEBUG
             Debug.WriteLine("Amount of white pixels: " + _whitePixelList.Count);
 #endif
 
+            // If no white pixels and mouse button was pressed, create a new node on main canvas
             if (_whitePixelList.Count == 0 && _mouseLeftButtonUpPressed)
             {
                 TestCanvas.Children.Clear();
@@ -226,13 +254,13 @@ namespace PathfindingWPF
             }
         }
 
-        // Method to filter and return only the white pixels from a list of colors
+        // Method to filter and return only white pixels from list of colors
         private static List<Color> GetWhitePixelListFromPixelList(List<Color> pixelList)
         {
             return pixelList.Where(color => color.R == 0xFF && color.G == 0xFF && color.B == 0xFF).ToList();
         }
 
-        // Method to get the list of pixels from the test canvas
+        // Method to get list of pixels from test canvas
         private List<Color> GetPixelListFromTestCanvas()
         {
             var renderTargetBitmap = new RenderTargetBitmap((int)_halfTestCanvasSize * 2, (int)_halfTestCanvasSize * 2, 96d, 96d, PixelFormats.Pbgra32);
@@ -246,6 +274,7 @@ namespace PathfindingWPF
 
             var colorList = new List<Color>();
 
+            // Convert byte array to list of colors
             for (int i = 0; i < pixels.Length; i += 4)
             {
                 colorList.Add(Color.FromArgb(pixels[i + 3], pixels[i + 2], pixels[i + 1], pixels[i]));
@@ -254,7 +283,7 @@ namespace PathfindingWPF
             return colorList;
         }
 
-        // Method to create a circle node at the specified position
+        // Method to create a circle node at specified position
         private static Path CreateCircleNode(Point mousePosition)
         {
             var path = new Path
@@ -264,20 +293,22 @@ namespace PathfindingWPF
                 Fill = Brushes.LightBlue,
             };
 
+            // Create ellipse geometry for the circle node
             var ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
             path.Data = ellipseGeometry;
             return path;
         }
 
-        // Method to create a test circle node at the specified position
+        // Method to create a test circle node at specified position
         private static Path CreateTestCircleNode(Point mousePosition)
         {
             var path = new Path
             {
                 StrokeThickness = 2,
-                Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)),
+                Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)), // Light semi-transparent white
             };
 
+            // Create ellipse geometry for the test circle node
             var ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);
             path.Data = ellipseGeometry;
             return path;

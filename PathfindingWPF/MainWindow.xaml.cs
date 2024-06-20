@@ -79,6 +79,8 @@ namespace PathfindingWPF
         // Method to draw the map on the canvas, including nodes and lines between them
         private void DrawMapOnCanvas()
         {
+            MyCanvas.Children.Clear();
+            _lines.Clear();
             DrawNodesOnCanvas();
             DrawLinesOnCanvas();
         }
@@ -135,7 +137,6 @@ namespace PathfindingWPF
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
-                Fill = Brushes.LightBlue,
             };
 
             // Create geometry group for holding the node shapes
@@ -144,14 +145,37 @@ namespace PathfindingWPF
             // Add ellipse geometries for each node to the geometry group
             foreach (var node in _nodes)
             {
+                // Determine the fill color based on node selection status
+                Brush nodeFill;
+                if (node == _firstSelectedNode || node == _secondSelectedNode)
+                {
+                    nodeFill = Brushes.Green; // Selected node color (Green)
+                }
+                else
+                {
+                    nodeFill = Brushes.LightBlue; // Default node color
+                }
+
                 var ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
                 geometryGroup.Children.Add(ellipseGeometry);
+
+                // Create a path for each node to allow setting individual properties
+                var nodePath = new Path
+                {
+                    Data = ellipseGeometry,
+                    Fill = nodeFill,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 2
+                };
+
+                MyCanvas.Children.Add(nodePath); // Add each node to the canvas
             }
 
-            // Assign the geometry group to the path and add it to canvas
+            // Assign the geometry group to the path
             path.Data = geometryGroup;
             MyCanvas.Children.Add(path);
         }
+
 
         // Event handler for when the left mouse button is released on the canvas
         private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -177,10 +201,12 @@ namespace PathfindingWPF
                 if (_firstSelectedNode == null)
                 {
                     _firstSelectedNode = clickedNode;
+                    DrawMapOnCanvas();
                 }
                 else if (_secondSelectedNode == null)
                 {
                     _secondSelectedNode = clickedNode;
+                    DrawMapOnCanvas();
                     UsePathFinder(_firstSelectedNode, _secondSelectedNode);
                     // Reset after finding the path
                     _firstSelectedNode = null;
@@ -219,7 +245,6 @@ namespace PathfindingWPF
                 // Check if the node is within the halfTestCanvasSize range from the click position
                 if (x <= _halfTestCanvasSize && y <= _halfTestCanvasSize)
                 {
-                    // Adjust the position to ensure the node is within the test canvas bounds
                     x = node.Point.X - _mouseLeftButtonUpPosition.X < 0 ? _halfTestCanvasSize - x : _halfTestCanvasSize + x;
                     y = node.Point.Y - _mouseLeftButtonUpPosition.Y < 0 ? _halfTestCanvasSize - y : _halfTestCanvasSize + y;
 

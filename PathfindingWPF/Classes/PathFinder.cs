@@ -2,8 +2,8 @@
 {
     internal class PathFinder
     {
-        private readonly HashSet<Node> _closedSet = new(); // Nodes that have already been evaluated
-        private readonly List<Node> _openSet = new(); // Nodes that need to be evaluated
+        private HashSet<Node> _closedSet = new(); // Nodes that have already been evaluated
+        private List<Node> _openSet = new(); // Nodes that need to be evaluated
 
         // Starts the pathfinding algorithm from startNode to endNode
         public List<Node> Start(Node startNode, Node endNode)
@@ -42,7 +42,7 @@
                 if (_closedSet.Contains(neighborNode)) continue;
 
                 // If the neighbor is not in the open set, add it and calculate its costs
-                if (!_openSet.Contains(neighborNode))
+                if (true /*!_openSet.Contains(neighborNode)*/)
                 {
                     neighborNode.ParentNode = currentNode; // Set the parent node for path reconstruction
                     neighborNode.CalculateCosts(currentNode, endNode); // Calculate the costs
@@ -54,25 +54,52 @@
         // Gets the node with the lowest cost from the open set
         private Node GetCurrentNode()
         {
-            // Sort the open set by final cost and heuristic cost
-            _openSet.Sort((node1, node2) =>
-                node1.FinalCost == node2.FinalCost
-                    ? node1.HeuristicCost.CompareTo(node2.HeuristicCost)
-                    : node1.FinalCost.CompareTo(node2.FinalCost));
+            _openSet = _openSet.OrderBy(node => node.FinalCost).ToList();
+            Node currentNode = _openSet[0];
 
-            return _openSet.First(); // Return the node with the lowest cost
+            if (_openSet.Count > 1 && _openSet[0].FinalCost == _openSet[1].FinalCost)
+            {
+                double heuristicCost = _openSet[0].HeuristicCost;
+
+                foreach (Node node in _openSet)
+                {
+                    if (node.FinalCost == _openSet[0].FinalCost && heuristicCost > node.HeuristicCost)
+                    {
+                        heuristicCost = node.HeuristicCost;
+                        currentNode = node;
+                    }
+                }
+            }
+
+            return currentNode;
         }
 
         // Reconstructs the path from the end node to the start node
+        //private List<Node> ReconstructPath(Node startNode, Node endNode)
+        //{
+        //    List<Node> path = new();
+        //    for (Node current = endNode; current != startNode; current = current.ParentNode)
+        //    {
+        //        path.Add(current); // Add nodes to the path starting from the end node
+        //    }
+        //    path.Add(startNode); // Add the start node to the path
+        //    path.Reverse(); // Reverse the path to get the correct order from start to end
+        //    return path;
+        //}
+
         private List<Node> ReconstructPath(Node startNode, Node endNode)
         {
-            List<Node> path = new();
-            for (Node current = endNode; current != startNode; current = current.ParentNode)
+            List<Node> path = new List<Node>();
+
+            Node start = startNode;
+            Node current = endNode;
+
+            while (start != current)
             {
-                path.Add(current); // Add nodes to the path starting from the end node
+                path.Add(current);
+                current = current.ParentNode;
             }
-            path.Add(startNode); // Add the start node to the path
-            path.Reverse(); // Reverse the path to get the correct order from start to end
+            path.Add(current);
             return path;
         }
     }

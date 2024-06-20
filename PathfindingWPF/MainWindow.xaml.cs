@@ -79,8 +79,11 @@ namespace PathfindingWPF
         // Method to draw the map on the canvas, including nodes and lines between them
         private void DrawMapOnCanvas()
         {
+            // Clear MyCanvas
             MyCanvas.Children.Clear();
             _lines.Clear();
+
+            // Draw map on MyCanvas
             DrawNodesOnCanvas();
             DrawLinesOnCanvas();
         }

@@ -17,6 +17,7 @@ namespace PathfindingWPF
         private Point _mouseLeftButtonUpPosition;          // Position of the mouse when left button is released
         private bool _mouseLeftButtonUpPressed;            // Flag indicating if left mouse button is pressed
         private readonly double _halfTestCanvasSize = 25;  // Half size of the test canvas for node creation
+        private List<Node> _path = new();                  // List of nodes representing the shortst found path
 
         // Variables to store selected nodes for pathfinding
         private Node? _firstSelectedNode;                  // First node selected for pathfinding
@@ -32,22 +33,28 @@ namespace PathfindingWPF
             DrawMapOnCanvas();
 
             // Example usage of pathfinding algorithm between nodes
+            _firstSelectedNode = _nodes[0];
+            _secondSelectedNode = _nodes[3];
             UsePathFinder(_nodes[0], _nodes[3]);
+            _firstSelectedNode = null;
+            _secondSelectedNode = null;
         }
 
         // Method to find and display the path between two nodes using a pathfinding algorithm
         private void UsePathFinder(Node start, Node end)
         {
             PathFinder pathFinder = new PathFinder();
-            List<Node> path = pathFinder.Start(start, end);
+            _path = pathFinder.Start(start, end);
 
             // Output the path nodes to debug console
 #if DEBUG
-            foreach (Node node in path)
+            foreach (Node node in _path)
             {
                 Debug.WriteLine(node.Point);
             }
 #endif
+            DrawMapOnCanvas();
+            _path.Clear();
         }
 
         // Temporary method to create and set up nodes and their connections
@@ -91,24 +98,8 @@ namespace PathfindingWPF
         // Method to draw lines between nodes on the canvas
         private void DrawLinesOnCanvas()
         {
-            // Create a path for drawing lines
-            var path = new Path
-            {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2,
-                Fill = Brushes.LightBlue,
-            };
-
-            // Create geometry group for holding the line segments
-            var geometryGroup = CreateLines();
-            path.Data = geometryGroup;
-            MyCanvas.Children.Add(path);
-        }
-
-        // Method to create lines between neighbor nodes
-        private GeometryGroup CreateLines()
-        {
             var geometryGroup = new GeometryGroup();
+            var geometryGroupShortestPath = new GeometryGroup();
 
             // Iterate through each node to draw lines to its neighbors
             foreach (var node in _nodes)
@@ -118,18 +109,48 @@ namespace PathfindingWPF
                     // Check if the line between these nodes already exists
                     if (!_lines.Any(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)))
                     {
+                        // Check if both nodes are in _path
+                        if (_path.Contains(node) && _path.Contains(neighbor))
+                        {
+                            var pathGeometry = new PathGeometry();
+                            var pathFigure = new PathFigure { StartPoint = node.Point };
+                            pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
+                            pathGeometry.Figures.Add(pathFigure);
+                            geometryGroupShortestPath.Children.Add(pathGeometry);
+                            _lines.Add(new NodePath(node, neighbor, pathGeometry));
+                        }
                         // Create a line segment between node and its neighbor
-                        var pathGeometry = new PathGeometry();
-                        var pathFigure = new PathFigure { StartPoint = node.Point };
-                        pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
-                        pathGeometry.Figures.Add(pathFigure);
-                        geometryGroup.Children.Add(pathGeometry);
-                        _lines.Add(new NodePath(node, neighbor, pathGeometry));
+                        else
+                        {
+                            var pathGeometry = new PathGeometry();
+                            var pathFigure = new PathFigure { StartPoint = node.Point };
+                            pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
+                            pathGeometry.Figures.Add(pathFigure);
+                            geometryGroup.Children.Add(pathGeometry);
+                            _lines.Add(new NodePath(node, neighbor, pathGeometry));
+                        }
                     }
                 }
             }
 
-            return geometryGroup;
+            // Create a path for drawing lines
+            var path = new Path
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+            };
+            path.Data = geometryGroup;
+
+            // Create a path for drawing lines
+            var pathShortestPath = new Path
+            {
+                Stroke = Brushes.Green,
+                StrokeThickness = 2,
+            };
+            pathShortestPath.Data = geometryGroupShortestPath;
+
+            MyCanvas.Children.Add(path);
+            MyCanvas.Children.Add(pathShortestPath);
         }
 
         // Method to draw nodes on the canvas
@@ -152,7 +173,7 @@ namespace PathfindingWPF
                 Brush nodeFill;
                 if (node == _firstSelectedNode || node == _secondSelectedNode)
                 {
-                    nodeFill = Brushes.Green; // Selected node color (Green)
+                    nodeFill = Brushes.Green; // Selected node color
                 }
                 else
                 {
@@ -209,7 +230,6 @@ namespace PathfindingWPF
                 else if (_secondSelectedNode == null)
                 {
                     _secondSelectedNode = clickedNode;
-                    DrawMapOnCanvas();
                     UsePathFinder(_firstSelectedNode, _secondSelectedNode);
                     // Reset after finding the path
                     _firstSelectedNode = null;

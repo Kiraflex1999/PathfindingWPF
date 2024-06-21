@@ -398,5 +398,10 @@ namespace PathfindingWPF
                 DrawMapOnCanvas();
             }
         }
+
+        private void ButtonDeleteNode_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

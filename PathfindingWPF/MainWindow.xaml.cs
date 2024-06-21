@@ -171,12 +171,6 @@ namespace PathfindingWPF
         // Method to draw nodes on the canvas
         private void DrawNodesOnCanvas()
         {
-            // Create a path for drawing nodes
-            var path = new Path();
-
-            // Create geometry group for holding the node shapes
-            var geometryGroup = new GeometryGroup();
-
             // Add ellipse geometries for each node to the geometry group
             foreach (var node in _nodes)
             {
@@ -192,7 +186,6 @@ namespace PathfindingWPF
                 }
 
                 var ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
-                geometryGroup.Children.Add(ellipseGeometry);
 
                 // Create a path for each node to allow setting individual properties
                 var nodePath = new Path
@@ -205,10 +198,6 @@ namespace PathfindingWPF
 
                 MyCanvas.Children.Add(nodePath); // Add each node to the canvas
             }
-
-            // Assign the geometry group to the path
-            path.Data = geometryGroup;
-            MyCanvas.Children.Add(path);
         }
 
 

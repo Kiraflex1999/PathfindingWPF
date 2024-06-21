@@ -22,6 +22,7 @@ namespace PathfindingWPF
         // Variables to store selected nodes for pathfinding
         private Node? _firstSelectedNode;                       // First node selected for pathfinding
         private Node? _secondSelectedNode;                      // Second node selected for pathfinding
+        private bool _switchSelect = true;
 
         // Constructor for the MainWindow class
         public MainWindow()
@@ -37,8 +38,6 @@ namespace PathfindingWPF
             _secondSelectedNode = _nodes[3];
             UsePathFinder(_nodes[0], _nodes[3]);
             ResetNodes();
-            _firstSelectedNode = null;
-            _secondSelectedNode = null;
         }
 
         // Method for resetting nodes after using the PathFinder
@@ -65,8 +64,12 @@ namespace PathfindingWPF
             }
 #endif
             DrawMapOnCanvas();
+
+            // Reset everything
             _path.Clear();
             ResetNodes();
+            _firstSelectedNode = null;
+            _secondSelectedNode = null;
         }
 
         // Temporary method to create and set up nodes and their connections
@@ -230,22 +233,21 @@ namespace PathfindingWPF
             TestCanvasAddCloseNodes();
             _mouseLeftButtonUpPressed = true;
 
-            // Handle node selection for pathfinding
+            // Handle node selection
             Node? clickedNode = GetClickedNode(_mouseLeftButtonUpPosition);
             if (clickedNode != null)
             {
-                if (_firstSelectedNode == null)
+                if (_switchSelect)
                 {
                     _firstSelectedNode = clickedNode;
                     DrawMapOnCanvas();
+                    _switchSelect = false;
                 }
-                else if (_secondSelectedNode == null)
+                else
                 {
                     _secondSelectedNode = clickedNode;
-                    UsePathFinder(_firstSelectedNode, _secondSelectedNode);
-                    // Reset after finding the path
-                    _firstSelectedNode = null;
-                    _secondSelectedNode = null;
+                    DrawMapOnCanvas();
+                    _switchSelect = true;
                 }
             }
         }
@@ -372,14 +374,29 @@ namespace PathfindingWPF
             return path;
         }
 
+        // Method to start pathfinding between selected nodes
         private void ButtonPathFinding_Click(object sender, RoutedEventArgs e)
         {
-
+            if (_firstSelectedNode != null && _secondSelectedNode != null)
+            {
+                UsePathFinder(_firstSelectedNode, _secondSelectedNode);
+            }
         }
 
+        // Method to create path between selected nodes
         private void ButtonCreatePath_Click(object sender, RoutedEventArgs e)
         {
+            if (_firstSelectedNode != null && _secondSelectedNode != null)
+            {
+                if (_firstSelectedNode == _secondSelectedNode) { return; }
 
+                if (_firstSelectedNode.GetNeighborNodes().Contains(_secondSelectedNode)) { return; }
+
+                _firstSelectedNode.AddNeighborNode(_secondSelectedNode);
+                _secondSelectedNode.AddNeighborNode(_firstSelectedNode);
+
+                DrawMapOnCanvas();
+            }
         }
     }
 }

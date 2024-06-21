@@ -424,5 +424,10 @@ namespace PathfindingWPF
 
             _nodes.Remove(node);
         }
+
+        private void ButtonDeletePath_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

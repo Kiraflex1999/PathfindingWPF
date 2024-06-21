@@ -75,18 +75,6 @@
         }
 
         // Reconstructs the path from the end node to the start node
-        //private List<Node> ReconstructPath(Node startNode, Node endNode)
-        //{
-        //    List<Node> path = new();
-        //    for (Node current = endNode; current != startNode; current = current.ParentNode)
-        //    {
-        //        path.Add(current); // Add nodes to the path starting from the end node
-        //    }
-        //    path.Add(startNode); // Add the start node to the path
-        //    path.Reverse(); // Reverse the path to get the correct order from start to end
-        //    return path;
-        //}
-
         private List<Node> ReconstructPath(Node startNode, Node endNode)
         {
             List<Node> path = new List<Node>();

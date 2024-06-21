@@ -5,7 +5,7 @@ namespace PathfindingWPF.Classes
     internal class Node
     {
         public Point Point { get; set; } // The position of the node
-        private readonly List<Node> _neighborNodes; // List of neighboring nodes
+        private List<Node> _neighborNodes; // List of neighboring nodes
         public double Radius { get; set; } = 10; // Radius of the node for visualization
 
         public double CostFromStart { get; set; } // Cost from the start node to this node
@@ -66,6 +66,14 @@ namespace PathfindingWPF.Classes
             double x = Math.Abs(otherNode.Point.X - Point.X);
             double y = Math.Abs(otherNode.Point.Y - Point.Y);
             return Math.Sqrt(x * x + y * y);
+        }
+
+        // Resets the costs of the node
+        internal void CalculateCostsReset()
+        {
+            CostFromStart = 0;
+            HeuristicCost = 0;
+            FinalCost = 0;
         }
     }
 }

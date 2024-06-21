@@ -36,8 +36,19 @@ namespace PathfindingWPF
             _firstSelectedNode = _nodes[0];
             _secondSelectedNode = _nodes[3];
             UsePathFinder(_nodes[0], _nodes[3]);
+            ResetNodes();
             _firstSelectedNode = null;
             _secondSelectedNode = null;
+        }
+
+        // Method for resetting nodes after using the PathFinder
+        private void ResetNodes()
+        {
+            foreach (Node node in _nodes)
+            {
+                node.ParentNode = null;
+                node.CalculateCostsReset();
+            }
         }
 
         // Method to find and display the path between two nodes using a pathfinding algorithm
@@ -55,6 +66,7 @@ namespace PathfindingWPF
 #endif
             DrawMapOnCanvas();
             _path.Clear();
+            ResetNodes();
         }
 
         // Temporary method to create and set up nodes and their connections
@@ -109,8 +121,8 @@ namespace PathfindingWPF
                     // Check if the line between these nodes already exists
                     if (!_lines.Any(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)))
                     {
-                        // Check if both nodes are in _path
-                        if (_path.Contains(node) && _path.Contains(neighbor))
+                        // Check if both nodes are in _path and one is the parent of the other
+                        if (_path.Contains(node) && _path.Contains(neighbor) && (node.ParentNode == neighbor || neighbor.ParentNode == node))
                         {
                             var pathGeometry = new PathGeometry();
                             var pathFigure = new PathFigure { StartPoint = node.Point };

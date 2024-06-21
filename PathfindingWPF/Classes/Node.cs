@@ -75,5 +75,11 @@ namespace PathfindingWPF.Classes
             HeuristicCost = 0;
             FinalCost = 0;
         }
+
+        // Removes neighbor from this node
+        internal void RemoveNeighborNode(Node node)
+        {
+            _neighborNodes.Remove(node);
+        }
     }
 }

@@ -399,9 +399,30 @@ namespace PathfindingWPF
             }
         }
 
+        // Method to delete selected nodes
         private void ButtonDeleteNode_Click(object sender, RoutedEventArgs e)
         {
+            if (_firstSelectedNode == null && _secondSelectedNode == null) { return; }
 
+            if (_firstSelectedNode == _secondSelectedNode) { _secondSelectedNode = null; }
+
+            DeleteNode(_firstSelectedNode);
+            DeleteNode(_secondSelectedNode);
+
+            DrawMapOnCanvas();
+        }
+
+        // Method to delete a node
+        private void DeleteNode(Node? node)
+        {
+            if (node == null) { return; }
+
+            foreach (Node neighbor in node.GetNeighborNodes())
+            {
+                neighbor.RemoveNeighborNode(node);
+            }
+
+            _nodes.Remove(node);
         }
     }
 }

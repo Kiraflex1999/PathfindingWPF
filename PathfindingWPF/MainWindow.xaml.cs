@@ -11,17 +11,17 @@ namespace PathfindingWPF
 {
     public partial class MainWindow : Window
     {
-        private readonly List<Node> _nodes;                // List of nodes representing points on the map
-        private List<Color> _whitePixelList = new();       // List of white pixels used in image processing
-        private readonly HashSet<NodePath> _lines = new(); // Set of lines (paths) between nodes
-        private Point _mouseLeftButtonUpPosition;          // Position of the mouse when left button is released
-        private bool _mouseLeftButtonUpPressed;            // Flag indicating if left mouse button is pressed
-        private readonly double _halfTestCanvasSize = 25;  // Half size of the test canvas for node creation
-        private List<Node> _path = new();                  // List of nodes representing the shortst found path
+        private readonly List<Node> _nodes;                     // List of nodes representing points on the map
+        private List<Color> _whitePixelList = new();            // List of white pixels used in image processing
+        private readonly HashSet<NodePath> _lines = new();      // Set of lines (paths) between nodes
+        private Point _mouseLeftButtonUpPosition;               // Position of the mouse when left button is released
+        private bool _mouseLeftButtonUpPressed;                 // Flag indicating if left mouse button is pressed
+        private readonly double _halfTestCanvasSize = 25;       // Half size of the test canvas for node creation
+        private List<Node> _path = new();                       // List of nodes representing the shortst found path
 
         // Variables to store selected nodes for pathfinding
-        private Node? _firstSelectedNode;                  // First node selected for pathfinding
-        private Node? _secondSelectedNode;                 // Second node selected for pathfinding
+        private Node? _firstSelectedNode;                       // First node selected for pathfinding
+        private Node? _secondSelectedNode;                      // Second node selected for pathfinding
 
         // Constructor for the MainWindow class
         public MainWindow()
@@ -370,6 +370,16 @@ namespace PathfindingWPF
             var ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);
             path.Data = ellipseGeometry;
             return path;
+        }
+
+        private void ButtonPathFinding_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ButtonCreatePath_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

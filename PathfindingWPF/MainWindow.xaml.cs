@@ -171,7 +171,7 @@ namespace PathfindingWPF
         // Method to draw nodes on the canvas
         private void DrawNodesOnCanvas()
         {
-            // Add ellipse geometries for each node to the geometry group
+            // Add ellipse geometries for each node
             foreach (var node in _nodes)
             {
                 // Determine the fill color based on node selection status

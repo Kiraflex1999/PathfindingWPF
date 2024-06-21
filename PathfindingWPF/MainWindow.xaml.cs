@@ -172,11 +172,7 @@ namespace PathfindingWPF
         private void DrawNodesOnCanvas()
         {
             // Create a path for drawing nodes
-            var path = new Path
-            {
-                Stroke = Brushes.Black,
-                StrokeThickness = 2,
-            };
+            var path = new Path();
 
             // Create geometry group for holding the node shapes
             var geometryGroup = new GeometryGroup();
@@ -425,9 +421,17 @@ namespace PathfindingWPF
             _nodes.Remove(node);
         }
 
+        // Method to delete the path between the two selected nodes
         private void ButtonDeletePath_Click(object sender, RoutedEventArgs e)
         {
+            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
 
+            if (_firstSelectedNode == _secondSelectedNode) { return; }
+
+            _firstSelectedNode.RemoveNeighborNode(_secondSelectedNode);
+            _secondSelectedNode.RemoveNeighborNode(_firstSelectedNode);
+
+            DrawMapOnCanvas();
         }
     }
 }

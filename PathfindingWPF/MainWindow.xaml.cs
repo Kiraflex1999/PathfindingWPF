@@ -29,6 +29,10 @@ namespace PathfindingWPF
         {
             InitializeComponent();
 
+            // Test SQL
+            SQL sql = new SQL();
+            sql.Try();
+
             // Initialize nodes and draw the map
             _nodes = TempNodesCreation();
             DrawMapOnCanvas();

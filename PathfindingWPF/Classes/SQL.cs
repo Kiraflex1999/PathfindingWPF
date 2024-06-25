@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using System.Data;
 using System.Diagnostics;
 
 namespace PathfindingWPF.Classes
@@ -15,10 +16,7 @@ namespace PathfindingWPF.Classes
 
                 using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
                 {
-                    Debug.WriteLine("\nQuery data example:");
-                    Debug.WriteLine("=========================================\n");
-
-                    String sql = "SELECT name, collation_name FROM sys.databases";
+                    string sql = "SELECT Id, X, Y FROM dbo.Nodes";
 
                     using (SqlCommand command = new SqlCommand(sql, connection))
                     {
@@ -27,7 +25,9 @@ namespace PathfindingWPF.Classes
                         {
                             while (reader.Read())
                             {
-                                Debug.WriteLine("{0} {1}", reader.GetString(0), reader.GetString(1));
+                                var record = (IDataRecord)reader;
+
+                                Debug.WriteLine($"{record[0]} {record[1]} {record[2]}");
                             }
                         }
                     }

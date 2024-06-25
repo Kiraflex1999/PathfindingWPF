@@ -6,19 +6,65 @@
         xmlns:local="clr-namespace:PathfindingWPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <!-- Main container for the window layout -->
     <Grid>
+        <!-- Main canvas where user interactions and drawings happen -->
         <Canvas Name="MyCanvas"
                 MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
-                Background="White">
-            <Grid>
-                <Canvas Name="TestCanvas"
-                        Height="50"
-                        MaxHeight="50"
-                        Width="50"
-                        MaxWidth="50"
-                        Background="Black"
-                        />
-            </Grid>
-        </Canvas>
+                Background="White"/>
+
+        <!-- Secondary canvas for testing purposes -->
+        <Canvas Name="TestCanvas"
+                Height="50"
+                MaxHeight="50"
+                Width="50"
+                MaxWidth="50"
+                Background="Black" 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Top"/>
+
+        <Button Name="ButtonPathFinding"
+                Height="25"
+                MaxHeight="25"
+                Width="100"
+                MaxWidth="100" 
+                Margin="0,0,115,10" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom" 
+                Click="ButtonPathFinding_Click" 
+                Content="PathFinding"/>
+
+        <Button Name="ButtonCreatePath"
+                Height="25"
+                MaxHeight="25"
+                Width="100"
+                MaxWidth="100"
+                Margin="0,0,10,10" 
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Bottom" 
+                Click="ButtonCreatePath_Click" 
+                Content="CreatePath"/>
+
+        <Button Name="ButtonDeleteNode"
+                Height="25"
+                MaxHeight="25"
+                Width="100"
+                MaxWidth="100" 
+                Margin="0,0,220,10" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right" 
+                Click="ButtonDeleteNode_Click"
+                Content="DeleteNode"/>
+
+        <Button Name="ButtonDeletePath"
+                Height="25"
+                MaxHeight="25"
+                Width="100"
+                MaxWidth="100" 
+                Margin="0,0,325,10" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right" 
+                Click="ButtonDeletePath_Click" 
+                Content="DeletePath"/>
     </Grid>
 </Window>

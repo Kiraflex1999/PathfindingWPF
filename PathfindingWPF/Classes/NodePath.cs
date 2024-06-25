@@ -4,11 +4,12 @@ namespace PathfindingWPF.Classes
 {
     internal class NodePath
     {
-        public Node StartNode { get; set; }
-        public Node EndNode { get; set; }
-        public PathGeometry PathGeometry { get; set; }
+        public Node StartNode { get; set; } // The starting node of the path
+        public Node EndNode { get; set; } // The ending node of the path
+        public PathGeometry PathGeometry { get; set; } // The graphical representation of the path
 
-        public NodePath(Node startNode, Node endNode, PathGeometry pathGeometry) 
+        // Constructor to initialize a NodePath with start node, end node, and path geometry
+        public NodePath(Node startNode, Node endNode, PathGeometry pathGeometry)
         {
             StartNode = startNode;
             EndNode = endNode;

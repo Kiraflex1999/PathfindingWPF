@@ -66,5 +66,16 @@
                 HorizontalAlignment="Right" 
                 Click="ButtonDeletePath_Click" 
                 Content="DeletePath"/>
+
+        <Button Name="ButtonSaveToDatabase"
+                Height="25"
+                MaxHeight="25"
+                Width="100"
+                MaxWidth="100" 
+                Margin="0,0,430,10" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right"
+                Click="ButtonSaveToDatabase_Click"
+                Content="Save"/>
     </Grid>
 </Window>

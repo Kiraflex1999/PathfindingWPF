@@ -44,6 +44,7 @@ namespace PathfindingWPF
             DrawMapOnCanvas();
         }
 
+        // Method connects to databas and returns a list of nodes
         private List<Node> GetNodesFromDatabase()
         {
             SQL database = new();
@@ -408,6 +409,14 @@ namespace PathfindingWPF
             _secondSelectedNode.RemoveNeighborNode(_firstSelectedNode);
 
             DrawMapOnCanvas();
+        }
+
+        // Method to save current _nodes to database
+        private void ButtonSaveToDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            SQL database = new();
+
+            database.SaveNodes(_nodes);
         }
     }
 }

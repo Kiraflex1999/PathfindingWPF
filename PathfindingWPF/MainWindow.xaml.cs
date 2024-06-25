@@ -31,7 +31,7 @@ namespace PathfindingWPF
 
             // Test SQL
             SQL sql = new SQL();
-            sql.Try();
+            sql.GetData();
 
             // Initialize nodes and draw the map
             _nodes = TempNodesCreation();

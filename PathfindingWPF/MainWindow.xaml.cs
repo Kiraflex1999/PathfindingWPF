@@ -29,19 +29,20 @@ namespace PathfindingWPF
         {
             InitializeComponent();
 
-            // Test SQL
-            SQL sql = new SQL();
-            sql.GetData();
+            _nodes = GetNodesFromDatabase();
 
-            // Initialize nodes and draw the map
-            _nodes = TempNodesCreation();
             DrawMapOnCanvas();
+        }
 
-            // Example usage of pathfinding algorithm between nodes
-            _firstSelectedNode = _nodes[0];
-            _secondSelectedNode = _nodes[3];
-            UsePathFinder(_nodes[0], _nodes[3]);
-            ResetNodes();
+        private List<Node> GetNodesFromDatabase()
+        {
+            SQL database = new();
+
+            List<Node> nodes = database.GetNodeData();
+
+            nodes = database.GetNeighborNodeData(nodes);
+
+            return nodes;
         }
 
         // Method for resetting nodes after using the PathFinder
@@ -74,32 +75,6 @@ namespace PathfindingWPF
             ResetNodes();
             _firstSelectedNode = null;
             _secondSelectedNode = null;
-        }
-
-        // Temporary method to create and set up nodes and their connections
-        private List<Node> TempNodesCreation()
-        {
-            // Create nodes with specific positions
-            var node1 = new Node(new Point(200, 200));
-            var node2 = new Node(new Point(600, 200));
-            var node3 = new Node(new Point(800, 400));
-            var node4 = new Node(new Point(1000, 800));
-            var node5 = new Node(new Point(400, 400));
-            var node6 = new Node(new Point(700, 500));
-            var node7 = new Node(new Point(200, 600));
-            var node8 = new Node(new Point(600, 600));
-
-            // Define neighbor relationships between nodes
-            node1.AddNeighborNode(new List<Node> { node2, node5 });
-            node2.AddNeighborNode(new List<Node> { node1, node3, node8 });
-            node3.AddNeighborNode(new List<Node> { node2, node6, node4 });
-            node4.AddNeighborNode(new List<Node> { node3, node6, node8 });
-            node5.AddNeighborNode(new List<Node> { node1, node7 });
-            node6.AddNeighborNode(new List<Node> { node3, node4, node8 });
-            node7.AddNeighborNode(new List<Node> { node5, node8 });
-            node8.AddNeighborNode(new List<Node> { node2, node4, node6, node7 });
-
-            return new List<Node> { node1, node2, node3, node4, node5, node6, node7, node8 };
         }
 
         // Method to draw the map on the canvas, including nodes and lines between them
@@ -204,7 +179,6 @@ namespace PathfindingWPF
             }
         }
 
-
         // Event handler for when the left mouse button is released on the canvas
         private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -279,7 +253,6 @@ namespace PathfindingWPF
                 }
             }
         }
-
 
         // Event handler for when the layout of the test canvas is updated
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)

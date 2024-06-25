@@ -1,44 +1,69 @@
 ﻿using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Diagnostics;
 using System.Windows;
 
 namespace PathfindingWPF.Classes
 {
     internal class SQL
     {
-        public List<Node>? GetData()
+        private SqlConnection _connection;
+        private readonly string _connectionString =
+            "server=127.0.0.1,1433;" +
+            "user id=SA;" +
+            "password=Mailo2010;" +
+            "initial catalog=PathFinding;" +
+            "TrustServerCertificate=True";
+
+        public SQL()
         {
-            List<Node>? nodes = null;
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            builder.ConnectionString = _connectionString;
+            _connection = new SqlConnection(builder.ConnectionString);
+        }
 
-            try
+        internal List<Node> GetNodeData()
+        {
+            List<Node> nodes = new();
+
+            string query = "SELECT Id, X, Y FROM dbo.Nodes";
+
+            using (SqlCommand command = new SqlCommand(query, _connection))
             {
-                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-                builder.ConnectionString = "server=127.0.0.1,1433;user id=SA;password=Mailo2010;initial catalog=PathFinding;TrustServerCertificate=True";
-
-                using (SqlConnection connection = new SqlConnection(builder.ConnectionString))
+                _connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    string query = "SELECT Id, X, Y FROM dbo.Nodes";
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    while (reader.Read())
                     {
-                        connection.Open();
-                        using (SqlDataReader reader = command.ExecuteReader())
-                        {
-                            nodes = new();
+                        var record = (IDataRecord)reader;
 
-                            while (reader.Read())
-                            {
-                                var record = (IDataRecord)reader;
-
-                                nodes.Add(new Node((int)record[0], new Point(Convert.ToDouble(record[1]), Convert.ToDouble(record[2]))));
-                            }
-                        }
+                        nodes.Add(new Node((int)record[0], new Point(Convert.ToDouble(record[1]), Convert.ToDouble(record[2]))));
                     }
                 }
+                _connection.Close();
             }
-            catch (SqlException e)
+
+            return nodes;
+        }
+
+        internal List<Node> GetNeighborNodeData(List<Node> nodes)
+        {
+            string query = "SELECT NodesId1, NodesId2 FROM dbo.Nodes_Nodes";
+
+            using (SqlCommand command = new SqlCommand(query, _connection))
             {
-                Debug.WriteLine(e.ToString());
+                _connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var record = (IDataRecord)reader;
+
+                        var node = nodes.Where(node => node.Id == (int)record[0]).Single();
+
+                        node.AddNeighborNode(nodes.Where(node => node.Id == (int)record[1]).Single());
+                    }
+                }
+                _connection.Close();
             }
 
             return nodes;

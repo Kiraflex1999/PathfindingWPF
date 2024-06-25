@@ -4,7 +4,7 @@ namespace PathfindingWPF.Classes
 {
     internal class Node
     {
-        public int Id;
+        public int? Id;
         public Point Point { get; set; } // The position of the node
         private List<Node> _neighborNodes; // List of neighboring nodes
         public double Radius { get; set; } = 10; // Radius of the node for visualization

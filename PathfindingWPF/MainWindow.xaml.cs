@@ -29,7 +29,17 @@ namespace PathfindingWPF
         {
             InitializeComponent();
 
-            _nodes = GetNodesFromDatabase();
+            try
+            {
+                _nodes = GetNodesFromDatabase();
+            }
+            catch (Exception e)
+            {
+#if DEBUG
+                Debug.WriteLine(e);
+#endif
+                _nodes = new();
+            }
 
             DrawMapOnCanvas();
         }

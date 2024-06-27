@@ -417,6 +417,7 @@ namespace PathfindingWPF
             SQL database = new();
 
             database.SaveNodes(_nodes);
+            database.SaveNeighborNodes(_nodes);
         }
     }
 }

@@ -7,6 +7,13 @@ namespace PathfindingWPF
         public MainWindow()
         {
             InitializeComponent();
+
+            DrawMyCanvas();
+        }
+
+        private void DrawMyCanvas()
+        {
+
         }
 
         private void MyCanvas_MouseLeftButtonUp(object sender, RoutedEventArgs e)

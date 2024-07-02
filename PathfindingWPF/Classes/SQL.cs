@@ -21,6 +21,7 @@ namespace PathfindingWPF.Classes
             _connection = new SqlConnection(builder.ConnectionString);
         }
 
+        #region SQL
         public List<Node> GetNodes()
         {
             List<Node> nodes = new();
@@ -44,5 +45,6 @@ namespace PathfindingWPF.Classes
 
             return nodes;
         }
+        #endregion
     }
 }

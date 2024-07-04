@@ -7,12 +7,12 @@ namespace PathfindingWPF.Classes
         private List<Node> _nodes;
 
         public Point Point { get; init; }
-        public int SizeX { get; } = 400;
-        public int SizeY { get; } = 400;
+        public int SizeX { get; init; }
 
-        public Chunk(Point point)
+        public Chunk(Point point, int sizeX)
         {
             Point = point;
+            SizeX = sizeX;
             _nodes = new();
         }
 
@@ -27,6 +27,14 @@ namespace PathfindingWPF.Classes
             if (node != null)
             {
                 _nodes.Add(node);
+            }
+        }
+
+        public void AddNode(List<Node> nodes)
+        {
+            foreach (Node node in nodes)
+            {
+                AddNode(node);
             }
         }
         #endregion

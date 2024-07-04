@@ -24,7 +24,7 @@ namespace PathfindingWPF.Classes
         #region SQL
         public List<Node> GetNodes()
         {
-            List<Node> nodes = new();
+            var nodes = new List<Node>();
 
             string query = "SELECT X, Y FROM dbo.Nodes";
 
@@ -38,6 +38,33 @@ namespace PathfindingWPF.Classes
                         var record = (IDataRecord)reader;
 
                         nodes.Add(new Node(new Point(Convert.ToDouble(record[1]), Convert.ToDouble(record[2]))));
+                    }
+                }
+                _connection.Close();
+            }
+
+            return nodes;
+        }
+
+        public List<Node> GetChunkNodes(Chunk chunk)
+        {
+            var nodes = new List<Node>();
+
+            string query =
+                $"SELECT X, Y FROM dbo.Nodes " +
+                $"WHERE X BETWEEN {chunk.Point.X} AND {chunk.Point.X + chunk.SizeX} " +
+                $"AND Y BETWEEN {chunk.Point.Y} AND {chunk.Point.Y + chunk.SizeX};";
+
+            using (SqlCommand command = new(query, _connection))
+            {
+                _connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var record = (IDataRecord)reader;
+
+                        nodes.Add(new Node(new Point(Convert.ToDouble(record[0]), Convert.ToDouble(record[1]))));
                     }
                 }
                 _connection.Close();

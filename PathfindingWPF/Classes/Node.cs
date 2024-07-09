@@ -6,6 +6,7 @@ namespace PathfindingWPF.Classes
     {
         private List<Node> _neighborNodes;
 
+        public int Id { get; init; }
         public Point Point { get; set; }
         public double Radius { get; set; } = 10;
 
@@ -22,8 +23,22 @@ namespace PathfindingWPF.Classes
             _neighborNodes = new List<Node>();
         }
 
+        public Node(int id, Point point)
+        {
+            Id = id;
+            Point = point;
+            _neighborNodes = new List<Node>();
+        }
+
         public Node(Point point, List<Node> neighborNodes)
         {
+            Point = point;
+            _neighborNodes = neighborNodes;
+        }
+
+        public Node(int id, Point point, List<Node> neighborNodes)
+        {
+            Id = id;
             Point = point;
             _neighborNodes = neighborNodes;
         }

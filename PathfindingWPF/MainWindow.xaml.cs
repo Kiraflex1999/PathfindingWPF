@@ -1,13 +1,13 @@
 ﻿using PathfindingWPF.Classes;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace PathfindingWPF
 {
     public partial class MainWindow : Window
     {
         private List<Chunk> _chunks;
+        private List<Classes.Path> _paths;
         private SQL _sql;
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
@@ -17,8 +17,8 @@ namespace PathfindingWPF
             InitializeComponent();
 
             _sql = new SQL();
-
             _chunks = new List<Chunk>();
+            _paths = new List<Classes.Path>();
 
             MyCanvas.SizeChanged += MyCanvas_SizeChanged;
         }
@@ -46,6 +46,27 @@ namespace PathfindingWPF
 
             return chunks;
         }
+
+        private void AddNeighborsToNodes()
+        {
+            foreach (var chunk in _chunks)
+            {
+                foreach (var node in chunk.GetNodes())
+                {
+                    var nodeList = new List<Node>();
+                    var paths = _paths.Where(path => path.NodeId1 == node.Id || path.NodeId2 == node.Id).ToList();
+
+                    if (paths.Count() == 0) { continue; }
+
+                    foreach (var path in paths)
+                    {
+
+                    }
+
+                    node.AddNeighborNode(nodeList);
+                }
+            }
+        }
         #endregion
 
         #region MyCanvas
@@ -60,11 +81,20 @@ namespace PathfindingWPF
             _chunks.Clear();
 
             _chunks = GetChunks();
+            _paths = _sql.GetPaths(_chunks);
+
+            AddNeighborsToNodes();
 
             if (_chunks.Count > 0)
             {
                 DrawNodes();
+                DrawPaths();
             }
+        }
+
+        private void DrawPaths()
+        {
+
         }
 
         private void DrawNodes()
@@ -85,7 +115,7 @@ namespace PathfindingWPF
 
                     var ellipseGeometry = new EllipseGeometry(node.Point, node.Radius, node.Radius);
 
-                    var nodePath = new Path
+                    var nodePath = new System.Windows.Shapes.Path
                     {
                         Data = ellipseGeometry,
                         Fill = nodeFill,

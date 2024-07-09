@@ -8,6 +8,8 @@ namespace PathfindingWPF
     {
         private List<Chunk> _chunks;
         private List<Classes.Path> _paths;
+        private HashSet<NodePath> _lines;
+        private List<Node> _shortestPath;
         private SQL _sql;
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
@@ -19,6 +21,8 @@ namespace PathfindingWPF
             _sql = new SQL();
             _chunks = new List<Chunk>();
             _paths = new List<Classes.Path>();
+            _shortestPath = new List<Node>();
+            _lines = new HashSet<NodePath>();
 
             MyCanvas.SizeChanged += MyCanvas_SizeChanged;
         }
@@ -126,7 +130,53 @@ namespace PathfindingWPF
             var geometryGroup = new GeometryGroup();
             var geometryGroupShortestPath = new GeometryGroup();
 
+            foreach (var chunk in _chunks)
+            {
+                foreach (var node in chunk.GetNodes())
+                {
+                    foreach (var neighbor in node.GetNeighborNodes())
+                    {
+                        if (!_lines.Any(x => (x.StartNode == node && x.EndNode == neighbor) || (x.EndNode == node && x.StartNode == neighbor)))
+                        {
+                            if (_shortestPath.Contains(node) && _shortestPath.Contains(neighbor) && (node.ParentNode == neighbor || neighbor.ParentNode == node))
+                            {
+                                var pathGeometry = new PathGeometry();
+                                var pathFigure = new PathFigure { StartPoint = node.Point };
+                                pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
+                                pathGeometry.Figures.Add(pathFigure);
+                                geometryGroupShortestPath.Children.Add(pathGeometry);
+                                _lines.Add(new NodePath(node, neighbor, pathGeometry));
+                            }
+                            else
+                            {
+                                var pathGeometry = new PathGeometry();
+                                var pathFigure = new PathFigure { StartPoint = node.Point };
+                                pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
+                                pathGeometry.Figures.Add(pathFigure);
+                                geometryGroup.Children.Add(pathGeometry);
+                                _lines.Add(new NodePath(node, neighbor, pathGeometry));
+                            }
+                        }
+                    }
+                }
+            }
 
+            var path = new System.Windows.Shapes.Path
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+            };
+            path.Data = geometryGroup;
+
+            var pathShortestPath = new System.Windows.Shapes.Path
+            {
+                Stroke = Brushes.Green,
+                StrokeThickness = 2,
+            };
+            pathShortestPath.Data = geometryGroupShortestPath;
+
+            MyCanvas.Children.Add(path);
+            MyCanvas.Children.Add(pathShortestPath);
         }
 
         private void DrawNodes()

@@ -49,23 +49,52 @@ namespace PathfindingWPF
 
         private void AddNeighborsToNodes()
         {
+            var nodes = new List<Node>();
+
             foreach (var chunk in _chunks)
             {
                 foreach (var node in chunk.GetNodes())
                 {
-                    var nodeList = new List<Node>();
-                    var paths = _paths.Where(path => path.NodeId1 == node.Id || path.NodeId2 == node.Id).ToList();
-
-                    if (paths.Count() == 0) { continue; }
-
-                    foreach (var path in paths)
-                    {
-
-                    }
-
-                    node.AddNeighborNode(nodeList);
+                    nodes.Add(node);
                 }
             }
+
+            foreach (var node in nodes)
+            {
+                var neighbors = new List<Node>();
+                var paths = _paths.Where(path => path.NodeId1 == node.Id || path.NodeId2 == node.Id).ToList();
+
+                if (paths.Count() == 0) { continue; }
+
+                foreach (var path in paths)
+                {
+                    if (path.NodeId1 == node.Id)
+                    {
+                        var neighbor = nodes.Find(n => n.Id == path.NodeId2);
+                        if (neighbor != null)
+                        {
+                            if (!neighbors.Contains(neighbor))
+                            {
+                                neighbors.Add(neighbor);
+                            }
+                        }
+                    }
+                    else if (path.NodeId2 == node.Id)
+                    {
+                        var neighbor = nodes.Find(n => n.Id == path.NodeId1);
+                        if (neighbor != null)
+                        {
+                            if (!neighbors.Contains(neighbor))
+                            {
+                                neighbors.Add(neighbor);
+                            }
+                        }
+                    }
+                }
+
+                node.AddNeighborNode(neighbors);
+            }
+
         }
         #endregion
 
@@ -94,6 +123,9 @@ namespace PathfindingWPF
 
         private void DrawPaths()
         {
+            var geometryGroup = new GeometryGroup();
+            var geometryGroupShortestPath = new GeometryGroup();
+
 
         }
 

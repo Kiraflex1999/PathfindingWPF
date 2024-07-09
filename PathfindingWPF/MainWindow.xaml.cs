@@ -1,8 +1,10 @@
 ﻿using PathfindingWPF.Classes;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace PathfindingWPF
 {
@@ -17,6 +19,8 @@ namespace PathfindingWPF
         private Node? _secondSelectedNode;
         private Point _mouseLeftButtonUpPosition;
         private bool _mouseLeftButtonUpPressed;
+        private bool _switchSelect;
+        private List<Color> _whitePixelList;
         private readonly int _halfTestCanvasSize = 25;
 
         public MainWindow()
@@ -28,6 +32,7 @@ namespace PathfindingWPF
             _paths = new List<Classes.Path>();
             _shortestPath = new List<Node>();
             _lines = new HashSet<NodePath>();
+            _whitePixelList = new List<Color>();
 
             MyCanvas.SizeChanged += MyCanvas_SizeChanged;
         }
@@ -110,9 +115,6 @@ namespace PathfindingWPF
         #region MyCanvas
         private void MyCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            _chunks = GetChunks();
-            _paths = _sql.GetPaths(_chunks);
-
             DrawMyCanvas();
         }
 
@@ -120,6 +122,9 @@ namespace PathfindingWPF
         {
             MyCanvas.Children.Clear();
             _chunks.Clear();
+
+            _chunks = GetChunks();
+            _paths = _sql.GetPaths(_chunks);
 
             AddNeighborsToNodes();
 
@@ -222,13 +227,90 @@ namespace PathfindingWPF
             _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
 
             UseTestCanvas();
+
+            Node? clickedNode = GetClickedNode(_mouseLeftButtonUpPosition);
+            if (clickedNode != null)
+            {
+                if (_switchSelect)
+                {
+                    _firstSelectedNode = clickedNode;
+                    DrawMyCanvas();
+                    _switchSelect = false;
+                }
+                else
+                {
+                    _secondSelectedNode = clickedNode;
+                    DrawMyCanvas();
+                    _switchSelect = true;
+                }
+            }
         }
         #endregion
 
         #region TestCanvas
         private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
         {
+            var pixelList = GetPixelListFromTestCanvas();
+            _whitePixelList = GetWhitePixelListFromPixelList(pixelList);
 
+#if DEBUG
+            Debug.WriteLine("Amount of white pixels: " + _whitePixelList.Count);
+#endif
+
+            if (_whitePixelList.Count == 0 && _mouseLeftButtonUpPressed)
+            {
+                TestCanvas.Children.Clear();
+                MyCanvas.Children.Add(CreateCircleNode(_mouseLeftButtonUpPosition));
+                foreach (var chunk in _chunks)
+                {
+                    if (chunk.PosistionInChunk(_mouseLeftButtonUpPosition))
+                    {
+                        chunk.AddNode(new Node(_mouseLeftButtonUpPosition));
+                        break;
+                    }
+                }
+                _mouseLeftButtonUpPressed = false;
+            }
+        }
+
+        private UIElement CreateCircleNode(Point mousePosition)
+        {
+            var path = new System.Windows.Shapes.Path
+            {
+                Stroke = Brushes.Black,
+                StrokeThickness = 2,
+                Fill = Brushes.LightBlue,
+            };
+
+            var ellipseGeometry = new EllipseGeometry(mousePosition, 10, 10);
+            path.Data = ellipseGeometry;
+            return path;
+        }
+
+        private List<Color> GetWhitePixelListFromPixelList(List<Color> pixelList)
+        {
+            return pixelList.Where(color => color.R == 0xFF && color.G == 0xFF && color.B == 0xFF).ToList();
+        }
+
+        private List<Color> GetPixelListFromTestCanvas()
+        {
+            var renderTargetBitmap = new RenderTargetBitmap((int)_halfTestCanvasSize * 2, (int)_halfTestCanvasSize * 2, 96d, 96d, PixelFormats.Pbgra32);
+            TestCanvas.Measure(new Size(_halfTestCanvasSize * 2, _halfTestCanvasSize * 2));
+            renderTargetBitmap.Render(TestCanvas);
+
+            var stride = (int)TestCanvas.ActualWidth * 4;
+            var arraySize = (int)TestCanvas.ActualHeight * stride;
+            var pixels = new byte[arraySize];
+            renderTargetBitmap.CopyPixels(pixels, stride, 0);
+
+            var colorList = new List<Color>();
+
+            for (int i = 0; i < pixels.Length; i += 4)
+            {
+                colorList.Add(Color.FromArgb(pixels[i + 3], pixels[i + 2], pixels[i + 1], pixels[i]));
+            }
+
+            return colorList;
         }
 
         private void UseTestCanvas()
@@ -238,6 +320,24 @@ namespace PathfindingWPF
 
             TestCanvasAddCloseNodes();
             _mouseLeftButtonUpPressed = true;
+        }
+
+        private Node? GetClickedNode(Point clickPosition)
+        {
+            foreach (var chunk in _chunks)
+            {
+                foreach (var node in chunk.GetNodes())
+                {
+                    double distance = Math.Sqrt(Math.Pow(clickPosition.X - node.Point.X, 2) + Math.Pow(clickPosition.Y - node.Point.Y, 2));
+
+                    if (distance <= node.Radius)
+                    {
+                        return node;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void TestCanvasAddCloseNodes()
@@ -265,7 +365,7 @@ namespace PathfindingWPF
             var path = new System.Windows.Shapes.Path
             {
                 StrokeThickness = 2,
-                Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)), // Light semi-transparent white
+                Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)),
             };
 
             var ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);

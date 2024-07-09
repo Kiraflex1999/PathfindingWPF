@@ -37,6 +37,21 @@ namespace PathfindingWPF.Classes
                 AddNode(node);
             }
         }
+
+        public bool PosistionInChunk(Point point)
+        {
+            if (point.X > Point.X &&
+                point.X < Point.X + SizeX &&
+                point.Y > Point.Y &&
+                point.Y < Point.Y + SizeX)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         #endregion
     }
 }

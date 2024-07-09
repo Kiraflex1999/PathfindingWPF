@@ -1,5 +1,7 @@
 ﻿using PathfindingWPF.Classes;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PathfindingWPF
@@ -13,6 +15,9 @@ namespace PathfindingWPF
         private SQL _sql;
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
+        private Point _mouseLeftButtonUpPosition;
+        private bool _mouseLeftButtonUpPressed;
+        private readonly int _halfTestCanvasSize = 25;
 
         public MainWindow()
         {
@@ -105,6 +110,9 @@ namespace PathfindingWPF
         #region MyCanvas
         private void MyCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            _chunks = GetChunks();
+            _paths = _sql.GetPaths(_chunks);
+
             DrawMyCanvas();
         }
 
@@ -112,9 +120,6 @@ namespace PathfindingWPF
         {
             MyCanvas.Children.Clear();
             _chunks.Clear();
-
-            _chunks = GetChunks();
-            _paths = _sql.GetPaths(_chunks);
 
             AddNeighborsToNodes();
 
@@ -210,9 +215,62 @@ namespace PathfindingWPF
             }
         }
 
-        private void MyCanvas_MouseLeftButtonUp(object sender, RoutedEventArgs e)
+        private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            TestCanvas.LayoutUpdated += TestCanvas_LayoutUpdated;
+
+            _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
+
+            UseTestCanvas();
+        }
+        #endregion
+
+        #region TestCanvas
+        private void TestCanvas_LayoutUpdated(object? sender, EventArgs e)
         {
 
+        }
+
+        private void UseTestCanvas()
+        {
+            TestCanvas.Children.Clear();
+            TestCanvas.Children.Add(CreateTestCircleNode(new Point(_halfTestCanvasSize - 1, _halfTestCanvasSize - 1)));
+
+            TestCanvasAddCloseNodes();
+            _mouseLeftButtonUpPressed = true;
+        }
+
+        private void TestCanvasAddCloseNodes()
+        {
+            foreach (var chunk in _chunks)
+            {
+                foreach (var node in chunk.GetNodes())
+                {
+                    var x = Math.Abs(node.Point.X - _mouseLeftButtonUpPosition.X);
+                    var y = Math.Abs(node.Point.Y - _mouseLeftButtonUpPosition.Y);
+
+                    if (x <= _halfTestCanvasSize && y <= _halfTestCanvasSize)
+                    {
+                        x = node.Point.X - _mouseLeftButtonUpPosition.X < 0 ? _halfTestCanvasSize - x : _halfTestCanvasSize + x;
+                        y = node.Point.Y - _mouseLeftButtonUpPosition.Y < 0 ? _halfTestCanvasSize - y : _halfTestCanvasSize + y;
+
+                        TestCanvas.Children.Add(CreateTestCircleNode(new Point(x, y)));
+                    }
+                }
+            }
+        }
+
+        private UIElement CreateTestCircleNode(Point mousePosition)
+        {
+            var path = new System.Windows.Shapes.Path
+            {
+                StrokeThickness = 2,
+                Fill = new SolidColorBrush(Color.FromArgb(245, 255, 255, 255)), // Light semi-transparent white
+            };
+
+            var ellipseGeometry = new EllipseGeometry(mousePosition, 12, 12);
+            path.Data = ellipseGeometry;
+            return path;
         }
         #endregion
 

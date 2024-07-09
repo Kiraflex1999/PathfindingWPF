@@ -9,11 +9,9 @@ namespace PathfindingWPF.Classes
         public int Id { get; init; }
         public Point Point { get; set; }
         public double Radius { get; set; } = 10;
-
         public double CostFromStart { get; set; }
         public double HeuristicCost { get; set; }
         public double FinalCost { get; set; }
-
         public Node? ParentNode { get; set; }
 
         #region Constructor

@@ -1,7 +1,6 @@
 ﻿namespace PathfindingWPF.Classes
 {
-    internal class SQL
+    internal class TestCanvas
     {
-
     }
 }

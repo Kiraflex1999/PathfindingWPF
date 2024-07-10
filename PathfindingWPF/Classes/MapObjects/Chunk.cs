@@ -38,7 +38,7 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
-        public bool PosistionInChunk(Point point)
+        public bool IsPosistionInChunk(Point point)
         {
             if (point.X > Point.X &&
                 point.X < Point.X + SizeX &&

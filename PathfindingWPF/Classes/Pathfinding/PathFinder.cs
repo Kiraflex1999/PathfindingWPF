@@ -75,7 +75,10 @@ namespace PathfindingWPF.Classes.Pathfinding
 
             while (start != current)
             {
+                if (current == null) { throw new NullReferenceException(); }
                 path.Add(current);
+
+                if (current.ParentNode == null) { throw new NullReferenceException(); }
                 current = current.ParentNode;
             }
             path.Add(current);

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace PathfindingWPF.Classes.Canvases
 {
@@ -10,5 +11,19 @@ namespace PathfindingWPF.Classes.Canvases
         {
             _myCanvas = myCanvas;
         }
+
+        #region MyCanvas
+        public void DrawMap()
+        {
+
+        }
+        #endregion
+
+        #region Interactions
+        public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+        #endregion
     }
 }

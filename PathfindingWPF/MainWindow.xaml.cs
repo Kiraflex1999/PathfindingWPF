@@ -1,5 +1,6 @@
 ﻿using PathfindingWPF.Classes.Canvases;
 using System.Windows;
+using System.Windows.Input;
 
 namespace PathfindingWPF
 {
@@ -14,7 +15,16 @@ namespace PathfindingWPF
 
             _myCanvas = new MyCanvas(ref MyCanvas);
             _testCanvas = new TestCanvas(ref TestCanvas);
+
+
         }
+
+        #region Canvas
+        private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _myCanvas.MouseLeftButtonUp(sender, e);
+        }
+        #endregion
 
         #region Buttons
         private void ButtonSaveToDatabase_Click(object sender, RoutedEventArgs e)

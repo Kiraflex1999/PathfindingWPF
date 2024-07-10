@@ -1,14 +1,22 @@
-﻿using System.Windows;
+﻿using PathfindingWPF.Classes.Canvases;
+using System.Windows;
 
 namespace PathfindingWPF
 {
     public partial class MainWindow : Window
     {
+        private MyCanvas _myCanvas;
+        private TestCanvas _testCanvas;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            _myCanvas = new MyCanvas(ref MyCanvas);
+            _testCanvas = new TestCanvas(ref TestCanvas);
         }
 
+        #region Buttons
         private void ButtonSaveToDatabase_Click(object sender, RoutedEventArgs e)
         {
 
@@ -33,5 +41,6 @@ namespace PathfindingWPF
         {
 
         }
+        #endregion
     }
 }

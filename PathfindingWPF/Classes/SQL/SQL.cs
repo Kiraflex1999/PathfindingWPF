@@ -1,4 +1,4 @@
-﻿namespace PathfindingWPF.Classes
+﻿namespace PathfindingWPF.Classes.SQL
 {
     internal class SQL
     {

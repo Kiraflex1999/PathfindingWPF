@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace PathfindingWPF.Classes
+namespace PathfindingWPF.Classes.MapObjects
 {
     internal class Node
     {

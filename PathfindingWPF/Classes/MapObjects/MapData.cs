@@ -9,6 +9,9 @@ namespace PathfindingWPF.Classes.MapObjects
         private List<Node> _nodes;
         private List<Path> _paths;
         private HashSet<Path> _lines;
+        private int _mapSizeX;
+        private int _mapSizeY;
+        private int _chunkSizeX;
         private SQL _sql;
         private Canvas _myCanvas;
 
@@ -35,6 +38,45 @@ namespace PathfindingWPF.Classes.MapObjects
             _paths = GetPathsFromDatabase();
 
             AddNeighborsToNodes();
+            GetMapSizeFromChunks();
+        }
+
+        private void GetMapSizeFromChunks()
+        {
+            _mapSizeX = 0;
+            _mapSizeY = 0;
+            _chunkSizeX = 0;
+
+            bool isMapSizeXFinished = false;
+
+            Chunk? lastChunk = null;
+
+            foreach (var chunk in _chunks)
+            {
+                if (lastChunk == null)
+                {
+                    lastChunk = chunk;
+                    _mapSizeX += chunk.SizeX;
+                    _mapSizeY += chunk.SizeX;
+                    _chunkSizeX = chunk.SizeX;
+                    continue;
+                }
+
+                if (chunk.Point.X > lastChunk.Point.X && !isMapSizeXFinished)
+                {
+                    _mapSizeX += chunk.SizeX;
+                    lastChunk = chunk;
+                    continue;
+                }
+
+                if (chunk.Point.Y > lastChunk.Point.Y)
+                {
+                    _mapSizeY += chunk.SizeX;
+                    lastChunk = chunk;
+                    isMapSizeXFinished = true;
+                    continue;
+                }
+            }
         }
 
         private void AddNeighborsToNodes()
@@ -114,6 +156,16 @@ namespace PathfindingWPF.Classes.MapObjects
         public HashSet<Path> GetLines()
         {
             return _lines;
+        }
+
+        public int GetMapSizeX()
+        {
+            return _mapSizeX;
+        }
+
+        public int GetMapSizeY()
+        {
+            return _mapSizeY;
         }
         #endregion
 

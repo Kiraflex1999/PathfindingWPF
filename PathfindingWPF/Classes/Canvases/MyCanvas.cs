@@ -127,9 +127,12 @@ namespace PathfindingWPF.Classes.Canvases
 
         public void SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            _mapData.RemoveEverything();
-            _mapData.GetMapDataFromDatabase();
-            DrawMap();
+            if (_myCanvas.ActualWidth > _mapData.GetMapSizeX() - _mapData.GetMapSizeX() ||
+                _myCanvas.ActualHeight > _mapData.GetMapSizeY() - _mapData.GetMapSizeX())
+            {
+                _mapData.GetMapDataFromDatabase();
+                DrawMap();
+            }
         }
         #endregion
     }

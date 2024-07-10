@@ -52,8 +52,8 @@ namespace PathfindingWPF.Classes.Database
 
             string query =
                 $"SELECT * FROM dbo.Nodes " +
-                $"WHERE X BETWEEN {chunk.Point.X} AND {chunk.Point.X + chunk.SizeX} " +
-                $"AND Y BETWEEN {chunk.Point.Y} AND {chunk.Point.Y + chunk.SizeX};";
+                $"WHERE X BETWEEN {chunk.Point.X} AND {chunk.Point.X + chunk.SizeX - 1} " +
+                $"AND Y BETWEEN {chunk.Point.Y} AND {chunk.Point.Y + chunk.SizeX - 1};";
 
             using (SqlCommand command = new(query, _connection))
             {

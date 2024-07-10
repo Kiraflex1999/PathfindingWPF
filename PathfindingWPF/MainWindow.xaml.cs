@@ -15,10 +15,12 @@ namespace PathfindingWPF
         }
 
         #region Canvas
-        private void MyCanvas_Initialized(object sender, EventArgs e)
+        private void MyCanvas_Loaded(object sender, RoutedEventArgs e)
         {
             _myCanvas = new MyCanvas(MyCanvas);
             _testCanvas = new TestCanvas(TestCanvas);
+
+            _myCanvas.DrawMap();
         }
 
         private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -60,6 +62,5 @@ namespace PathfindingWPF
 
         }
         #endregion
-
     }
 }

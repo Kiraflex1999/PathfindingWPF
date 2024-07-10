@@ -9,7 +9,9 @@
     <Grid>
         <Canvas Name="MyCanvas"
                 MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
-                Background="White" SizeChanged="MyCanvas_SizeChanged" Initialized="MyCanvas_Initialized"/>
+                Background="White" 
+                SizeChanged="MyCanvas_SizeChanged" 
+                Loaded="MyCanvas_Loaded"/>
 
         <Canvas Name="TestCanvas"
                 Height="50"

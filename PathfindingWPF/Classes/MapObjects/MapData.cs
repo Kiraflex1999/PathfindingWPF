@@ -8,6 +8,7 @@ namespace PathfindingWPF.Classes.MapObjects
         private List<Chunk> _chunks;
         private List<Node> _nodes;
         private List<Path> _paths;
+        private HashSet<Path> _lines;
         private SQL _sql;
         private Canvas _myCanvas;
 
@@ -19,6 +20,7 @@ namespace PathfindingWPF.Classes.MapObjects
             _chunks = new List<Chunk>();
             _nodes = new List<Node>();
             _paths = new List<Path>();
+            _lines = new HashSet<Path>();
 
             GetMapDataFromDatabase();
         }
@@ -39,17 +41,33 @@ namespace PathfindingWPF.Classes.MapObjects
         {
             foreach (var node in _nodes)
             {
+                var neighbors = new List<Node>();
                 foreach (var path in _paths)
                 {
                     if (path.NodeId1 == node.Id)
                     {
-                        node.AddNeighborNode(_nodes.Where(n => n.Id == path.NodeId2).Single());
+                        var neighbor = _nodes.Find(n => n.Id == path.NodeId2);
+                        if (neighbor != null)
+                        {
+                            if (!neighbors.Contains(neighbor))
+                            {
+                                neighbors.Add(neighbor);
+                            }
+                        }
                     }
                     else if (path.NodeId2 == node.Id)
                     {
-                        node.AddNeighborNode(_nodes.Where(n => n.Id == path.NodeId1).Single());
+                        var neighbor = _nodes.Find(n => n.Id == path.NodeId1);
+                        if (neighbor != null)
+                        {
+                            if (!neighbors.Contains(neighbor))
+                            {
+                                neighbors.Add(neighbor);
+                            }
+                        }
                     }
                 }
+                node.AddNeighborNode(neighbors);
             }
         }
 
@@ -91,6 +109,11 @@ namespace PathfindingWPF.Classes.MapObjects
         public List<Path> GetPaths()
         {
             return _paths;
+        }
+
+        public HashSet<Path> GetLines()
+        {
+            return _lines;
         }
         #endregion
 
@@ -136,6 +159,12 @@ namespace PathfindingWPF.Classes.MapObjects
                 AddPath(path);
             }
         }
+
+        public void AddLine(Path line)
+        {
+            if (line == null) { return; }
+            _lines.Add(line);
+        }
         #endregion
 
         #region Remove
@@ -178,11 +207,30 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
+        public bool RemoveLine(Path path)
+        {
+            return _lines.Remove(path);
+        }
+
+        public void RemoveLine(List<Path> paths)
+        {
+            foreach (var path in paths)
+            {
+                RemoveLine(path);
+            }
+        }
+
+        public void RemoveAllLines()
+        {
+            _lines.Clear();
+        }
+
         public void RemoveEverything()
         {
             _chunks.Clear();
             _nodes.Clear();
             _paths.Clear();
+            _lines.Clear();
         }
         #endregion
     }

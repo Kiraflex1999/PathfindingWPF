@@ -13,14 +13,12 @@ namespace PathfindingWPF.Classes.Canvases
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
         private List<Node> _shortestPath;
-        private HashSet<Path> _lines;
 
         public MyCanvas(Canvas myCanvas)
         {
             _myCanvas = myCanvas;
             _mapData = new MapData(myCanvas);
             _shortestPath = new List<Node>();
-            _lines = new HashSet<Path>();
         }
 
         #region MyCanvas
@@ -32,6 +30,7 @@ namespace PathfindingWPF.Classes.Canvases
         public void DrawMap()
         {
             _myCanvas.Children.Clear();
+            _mapData.RemoveAllLines();
 
             if (_mapData.GetChunks().Count > 0)
             {
@@ -77,7 +76,7 @@ namespace PathfindingWPF.Classes.Canvases
             {
                 foreach (var neighbor in node.GetNeighborNodes())
                 {
-                    if (!_lines.Any(x => (x.NodeId1 == node.Id && x.NodeId2 == neighbor.Id) || (x.NodeId2 == node.Id && x.NodeId1 == neighbor.Id)))
+                    if (!_mapData.GetLines().Any(x => (x.NodeId1 == node.Id && x.NodeId2 == neighbor.Id) || (x.NodeId2 == node.Id && x.NodeId1 == neighbor.Id)))
                     {
                         if (_shortestPath.Contains(node) && _shortestPath.Contains(neighbor) && (node.ParentNode == neighbor || neighbor.ParentNode == node))
                         {
@@ -86,7 +85,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroupShortestPath.Children.Add(pathGeometry);
-                            _lines.Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            _mapData.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
                         }
                         else
                         {
@@ -95,7 +94,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroup.Children.Add(pathGeometry);
-                            _lines.Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            _mapData.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
                         }
                     }
                 }
@@ -128,6 +127,8 @@ namespace PathfindingWPF.Classes.Canvases
 
         public void SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            _mapData.RemoveEverything();
+            _mapData.GetMapDataFromDatabase();
             DrawMap();
         }
         #endregion

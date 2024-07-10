@@ -6,7 +6,7 @@ namespace PathfindingWPF.Classes.Canvases
     {
         private readonly Canvas _testCanvas;
 
-        public TestCanvas(ref Canvas testCanvas)
+        public TestCanvas(Canvas testCanvas)
         {
             _testCanvas = testCanvas;
         }

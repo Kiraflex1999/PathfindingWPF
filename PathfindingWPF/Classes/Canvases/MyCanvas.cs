@@ -15,10 +15,10 @@ namespace PathfindingWPF.Classes.Canvases
         private List<Node> _shortestPath;
         private HashSet<Path> _lines;
 
-        public MyCanvas(ref Canvas myCanvas)
+        public MyCanvas(Canvas myCanvas)
         {
             _myCanvas = myCanvas;
-            _mapData = new MapData(ref myCanvas);
+            _mapData = new MapData(myCanvas);
             _shortestPath = new List<Node>();
             _lines = new HashSet<Path>();
         }

@@ -11,7 +11,7 @@ namespace PathfindingWPF.Classes.MapObjects
         private SQL _sql;
         private Canvas _myCanvas;
 
-        public MapData(ref Canvas myCanvas)
+        public MapData(Canvas myCanvas)
         {
             _myCanvas = myCanvas;
             _sql = new SQL();

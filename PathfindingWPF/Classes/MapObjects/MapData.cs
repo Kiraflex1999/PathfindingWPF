@@ -31,6 +31,26 @@ namespace PathfindingWPF.Classes.MapObjects
             _chunks = GetChunksFromDatabase();
             _nodes = GetNodesFromChunks();
             _paths = GetPathsFromDatabase();
+
+            AddNeighborsToNodes();
+        }
+
+        private void AddNeighborsToNodes()
+        {
+            foreach (var node in _nodes)
+            {
+                foreach (var path in _paths)
+                {
+                    if (path.NodeId1 == node.Id)
+                    {
+                        node.AddNeighborNode(_nodes.Where(n => n.Id == path.NodeId2).Single());
+                    }
+                    else if (path.NodeId2 == node.Id)
+                    {
+                        node.AddNeighborNode(_nodes.Where(n => n.Id == path.NodeId1).Single());
+                    }
+                }
+            }
         }
 
         private List<Path> GetPathsFromDatabase()

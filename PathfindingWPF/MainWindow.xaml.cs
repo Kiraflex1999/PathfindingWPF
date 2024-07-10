@@ -1,5 +1,4 @@
 ﻿using PathfindingWPF.Classes.Canvases;
-using PathfindingWPF.Classes.MapObjects;
 using System.Windows;
 using System.Windows.Input;
 
@@ -9,7 +8,6 @@ namespace PathfindingWPF
     {
         private MyCanvas _myCanvas;
         private TestCanvas _testCanvas;
-        private MapData _mapData;
 
         public MainWindow()
         {
@@ -17,14 +15,17 @@ namespace PathfindingWPF
 
             _myCanvas = new MyCanvas(ref MyCanvas);
             _testCanvas = new TestCanvas(ref TestCanvas);
-            _mapData = new MapData();
-
         }
 
         #region Canvas
         private void MyCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             _myCanvas.MouseLeftButtonUp(sender, e);
+        }
+
+        private void MyCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _myCanvas.SizeChanged(sender, e);
         }
         #endregion
 

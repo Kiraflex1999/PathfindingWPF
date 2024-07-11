@@ -19,7 +19,6 @@ namespace PathfindingWPF.Classes.MapObjects
         {
             _myCanvas = myCanvas;
             _sql = new SQL();
-
             _chunks = new List<Chunk>();
             _nodes = new List<Node>();
             _paths = new List<Path>();
@@ -167,6 +166,11 @@ namespace PathfindingWPF.Classes.MapObjects
         {
             return _mapSizeY;
         }
+
+        public int GetChunkSizeX()
+        {
+            return _chunkSizeX;
+        }
         #endregion
 
         #region Add
@@ -283,6 +287,14 @@ namespace PathfindingWPF.Classes.MapObjects
             _nodes.Clear();
             _paths.Clear();
             _lines.Clear();
+        }
+
+        public void ResetNodes()
+        {
+            foreach (var node in _nodes)
+            {
+                node.ParentNode = null;
+            }
         }
         #endregion
     }

@@ -28,7 +28,7 @@ namespace PathfindingWPF.Classes.Database
             var chunks = new List<Chunk>();
 
             double y = 0;
-            int chunkSize = 400;
+            int chunkSize = 250;
 
             while (y < canvasHeight + chunkSize)
             {

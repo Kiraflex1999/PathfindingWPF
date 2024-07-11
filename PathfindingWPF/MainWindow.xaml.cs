@@ -49,7 +49,12 @@ namespace PathfindingWPF
 
         private void ButtonDeleteNode_Click(object sender, RoutedEventArgs e)
         {
+            if (_myCanvas == null) { return; }
 
+            if (_myCanvas.GetFirstSelectedNode() != null && _myCanvas.GetSecondSelectedNode() != null)
+            {
+                _myCanvas.UsePathFinding();
+            }
         }
 
         private void ButtonPathFinding_Click(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using PathfindingWPF.Classes.MapObjects;
+using PathfindingWPF.Classes.Pathfinding;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ namespace PathfindingWPF.Classes.Canvases
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
         private List<Node> _shortestPath;
+        private Point _mouseLeftButtonUpPosition;
 
         public MyCanvas(Canvas myCanvas)
         {
@@ -20,6 +22,40 @@ namespace PathfindingWPF.Classes.Canvases
             _mapData = new MapData(myCanvas);
             _shortestPath = new List<Node>();
         }
+
+        #region Get
+        public MapData GetMapData()
+        {
+            return _mapData;
+        }
+
+        public Node? GetFirstSelectedNode()
+        {
+            return _firstSelectedNode;
+        }
+
+        public Node? GetSecondSelectedNode()
+        {
+            return _firstSelectedNode;
+        }
+        #endregion
+
+        #region Pathfinding
+        public void UsePathFinding()
+        {
+            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
+
+            var pathFinder = new PathFinder();
+            _shortestPath = pathFinder.Start(_firstSelectedNode, _secondSelectedNode);
+
+            DrawMap();
+
+            _shortestPath.Clear();
+            _mapData.ResetNodes();
+            _firstSelectedNode = null;
+            _secondSelectedNode = null;
+        }
+        #endregion
 
         #region MyCanvas
         public ref Canvas GetMyCanvas()
@@ -119,16 +155,25 @@ namespace PathfindingWPF.Classes.Canvases
         }
         #endregion
 
-        #region Interactions
+        #region Event Handlers
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
+
 
         }
 
         public void SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_myCanvas.ActualWidth > _mapData.GetMapSizeX() - _mapData.GetMapSizeX() ||
-                _myCanvas.ActualHeight > _mapData.GetMapSizeY() - _mapData.GetMapSizeX())
+            if (_myCanvas.ActualWidth > _mapData.GetMapSizeX() - _mapData.GetChunkSizeX() ||
+                _myCanvas.ActualHeight > _mapData.GetMapSizeY() - _mapData.GetChunkSizeX())
+            {
+                _mapData.GetMapDataFromDatabase();
+                DrawMap();
+            }
+
+            if (_myCanvas.ActualWidth + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX() ||
+                _myCanvas.ActualHeight + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX())
             {
                 _mapData.GetMapDataFromDatabase();
                 DrawMap();

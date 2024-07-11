@@ -1,4 +1,5 @@
-﻿using PathfindingWPF.Classes.MapObjects;
+﻿using PathfindingWPF.Classes.Logic;
+using PathfindingWPF.Classes.MapObjects;
 using PathfindingWPF.Classes.Pathfinding;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,7 +15,7 @@ namespace PathfindingWPF.Classes.Canvases
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
         private List<Node> _shortestPath;
-        private Point _mouseLeftButtonUpPosition;
+        private bool _switchSelect;
 
         public MyCanvas(Canvas myCanvas)
         {
@@ -103,6 +104,27 @@ namespace PathfindingWPF.Classes.Canvases
             }
         }
 
+        private void SelectNode(Node x)
+        {
+            if (_switchSelect)
+            {
+                _firstSelectedNode = (Node)x;
+                DrawMap();
+                _switchSelect = false;
+            }
+            else
+            {
+                _secondSelectedNode = (Node)x;
+                DrawMap();
+                _switchSelect = true;
+            }
+        }
+
+        private void CreateNode(Point mousePosition)
+        {
+            throw new NotImplementedException();
+        }
+
         private void DrawPaths()
         {
             var geometryGroup = new GeometryGroup();
@@ -158,9 +180,26 @@ namespace PathfindingWPF.Classes.Canvases
         #region Event Handlers
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            _mouseLeftButtonUpPosition = e.GetPosition((Canvas)sender);
+            var mousePosition = e.GetPosition((Canvas)sender);
 
+            var x = CollisionDetection.Use(mousePosition, _mapData);
 
+            switch (x)
+            {
+                case Node:
+                    SelectNode((Node)x);
+                    break;
+
+                case Path:
+                    throw new NotImplementedException();
+
+                case null:
+                    CreateNode(mousePosition);
+                    break;
+
+                default:
+                    throw new Exception("CollisionDetection Error");
+            }
         }
 
         public void SizeChanged(object sender, SizeChangedEventArgs e)

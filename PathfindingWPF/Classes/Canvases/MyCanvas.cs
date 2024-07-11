@@ -122,7 +122,20 @@ namespace PathfindingWPF.Classes.Canvases
 
         private void CreateNode(Point mousePosition)
         {
-            throw new NotImplementedException();
+            foreach (var chunk in _mapData.GetChunks())
+            {
+                if (mousePosition.X > chunk.Point.X &&
+                    mousePosition.X < chunk.Point.X + chunk.SizeX &&
+                    mousePosition.Y > chunk.Point.Y &&
+                    mousePosition.Y < chunk.Point.Y + chunk.SizeX)
+                {
+                    var newNode = new Node(mousePosition);
+
+                    chunk.AddNode(newNode);
+                    _mapData.AddNode(newNode);
+                }
+            }
+            DrawMap();
         }
 
         private void DrawPaths()
@@ -193,8 +206,11 @@ namespace PathfindingWPF.Classes.Canvases
                 case Path:
                     throw new NotImplementedException();
 
-                case null:
+                case CollisionDetection.ENewNode.True:
                     CreateNode(mousePosition);
+                    break;
+
+                case CollisionDetection.ENewNode.False:
                     break;
 
                 default:

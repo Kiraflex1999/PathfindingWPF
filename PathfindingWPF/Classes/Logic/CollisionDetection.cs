@@ -5,6 +5,12 @@ namespace PathfindingWPF.Classes.Logic
 {
     internal static class CollisionDetection
     {
+        public enum ENewNode
+        {
+            True,
+            False,
+        }
+
         public static object? Use(Point mousePosition, MapData mapData)
         {
             foreach (var chunk in mapData.GetChunks())
@@ -18,14 +24,18 @@ namespace PathfindingWPF.Classes.Logic
                     {
                         double distance = CalculateDelta(mousePosition, node);
 
-                        if (distance < node.Radius)
+                        if (distance <= node.Radius)
                         {
                             return node;
+                        }
+                        if (distance > node.Radius && distance < node.Radius * 2)
+                        {
+                            return ENewNode.False;
                         }
                     }
                 }
             }
-            return null;
+            return ENewNode.True;
         }
 
         private static double CalculateDelta(Point mousePosition, Node node)

@@ -223,23 +223,13 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
-        public void AddPath(Path path)
+        public void AddPath(Path path, Node node1, Node node2)
         {
             if (path == null) { return; }
             _paths.Add(path);
 
-            var nodes = _nodes.Where(n => n.Id == path.NodeId1 || n.Id == path.NodeId2).ToList();
-
-            nodes[0].AddNeighborNode(nodes[1]);
-            nodes[1].AddNeighborNode(nodes[0]);
-        }
-
-        public void AddPath(List<Path> paths)
-        {
-            foreach (var path in paths)
-            {
-                AddPath(path);
-            }
+            node1.AddNeighborNode(node2);
+            node2.AddNeighborNode(node1);
         }
 
         public void AddLine(Path line)

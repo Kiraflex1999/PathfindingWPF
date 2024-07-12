@@ -148,7 +148,7 @@ namespace PathfindingWPF.Classes.Canvases
         {
             if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
 
-            MapData.Instance.AddPath(new Path(_firstSelectedNode.Id, _secondSelectedNode.Id));
+            MapData.Instance.AddPath(new Path(_firstSelectedNode.Id, _secondSelectedNode.Id), _firstSelectedNode, _secondSelectedNode);
 
             DrawMap();
         }

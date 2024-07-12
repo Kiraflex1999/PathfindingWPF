@@ -129,6 +129,21 @@ namespace PathfindingWPF.Classes.Canvases
             DrawMap();
         }
 
+        public void DeleteNodes()
+        {
+            if (_firstSelectedNode != null)
+            {
+                MapData.Instance.RemoveNode(_firstSelectedNode);
+                _firstSelectedNode = null;
+            }
+            if (_secondSelectedNode != null)
+            {
+                MapData.Instance.RemoveNode(_secondSelectedNode);
+                _secondSelectedNode = null;
+            }
+            DrawMap();
+        }
+
         private void DrawPaths()
         {
             var geometryGroup = new GeometryGroup();

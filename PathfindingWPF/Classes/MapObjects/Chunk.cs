@@ -38,6 +38,14 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
+        public void RemoveNode(Node node)
+        {
+            if (node != null)
+            {
+                _nodes.Remove(node);
+            }
+        }
+
         public bool IsPosistionInChunk(Point point)
         {
             if (point.X > Point.X &&

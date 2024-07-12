@@ -22,7 +22,7 @@ namespace PathfindingWPF
 
         private void ButtonDeleteNode_Click(object sender, RoutedEventArgs e)
         {
-
+            MyCanvas.DeleteNodes();
         }
 
         private void ButtonPathFinding_Click(object sender, RoutedEventArgs e)

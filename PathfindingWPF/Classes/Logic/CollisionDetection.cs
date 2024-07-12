@@ -11,9 +11,9 @@ namespace PathfindingWPF.Classes.Logic
             False,
         }
 
-        public static object? Use(Point mousePosition, MapData mapData)
+        public static object? Use(Point mousePosition)
         {
-            foreach (var chunk in mapData.GetChunks())
+            foreach (var chunk in MapData.Instance.GetChunks())
             {
                 if (mousePosition.X > chunk.Point.X &&
                     mousePosition.X < chunk.Point.X + chunk.SizeX &&
@@ -28,7 +28,7 @@ namespace PathfindingWPF.Classes.Logic
                         {
                             return node;
                         }
-                        if (distance > node.Radius && distance <= node.Radius * 2)
+                        if (distance > node.Radius && distance <= node.Radius * 2 + 5)
                         {
                             return ENewNode.False;
                         }

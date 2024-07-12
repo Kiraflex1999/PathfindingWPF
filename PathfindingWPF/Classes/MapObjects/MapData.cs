@@ -5,31 +5,49 @@ namespace PathfindingWPF.Classes.MapObjects
 {
     public class MapData
     {
+        private static readonly MapData _instance = new MapData();
         private List<Chunk> _chunks;
         private List<Node> _nodes;
         private List<Path> _paths;
         private HashSet<Path> _lines;
         private int _mapSizeX;
         private int _mapSizeY;
-        private int _chunkSizeX;
+        private int _chunkSizeX = 250;
         private SQL _sql;
-        private Canvas _myCanvas;
+        private Canvas? _myCanvas;
 
-        public MapData(Canvas myCanvas)
+        private MapData()
         {
-            _myCanvas = myCanvas;
             _sql = new SQL();
             _chunks = new List<Chunk>();
             _nodes = new List<Node>();
             _paths = new List<Path>();
             _lines = new HashSet<Path>();
+        }
 
-            GetMapDataFromDatabase();
+        public static MapData Instance
+        {
+            get { return _instance; }
+        }
+
+        public void Initialize(Canvas myCanvas)
+        {
+            if (_myCanvas == null && myCanvas != null)
+            {
+                _myCanvas = myCanvas;
+                GetMapDataFromDatabase();
+            }
+            else
+            {
+                throw new ArgumentNullException(nameof(myCanvas));
+            }
         }
 
         #region Database
         public void GetMapDataFromDatabase()
         {
+            if (_myCanvas == null) { throw new ArgumentNullException(nameof(_myCanvas)); }
+
             RemoveEverything();
 
             _chunks = GetChunksFromDatabase();
@@ -132,6 +150,8 @@ namespace PathfindingWPF.Classes.MapObjects
 
         private List<Chunk> GetChunksFromDatabase()
         {
+            if (_myCanvas == null) { throw new ArgumentNullException(nameof(_myCanvas)); }
+
             return _sql.GetChunks(_myCanvas.ActualHeight, _myCanvas.ActualWidth);
         }
         #endregion
@@ -170,6 +190,13 @@ namespace PathfindingWPF.Classes.MapObjects
         public int GetChunkSizeX()
         {
             return _chunkSizeX;
+        }
+        #endregion
+
+        #region Set
+        public void SetCanvas(Canvas canvas)
+        {
+            _myCanvas = canvas;
         }
         #endregion
 

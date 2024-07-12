@@ -10,28 +10,22 @@ namespace PathfindingWPF.Classes.Canvases
 {
     public class MyCanvas : Canvas
     {
-        private MapData _mapData;
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
         private List<Node> _shortestPath;
         private bool _switchSelect;
+        private bool _isHandlingMouseEvent;
 
         public MyCanvas()
         {
-            _mapData = new MapData(this);
             _shortestPath = new List<Node>();
 
             MouseLeftButtonUp += OnMouseLeftButtonUp;
             SizeChanged += OnSizeChanged;
-            Loaded += OnLoaded;
+            Initialized += OnInitialized;
         }
 
         #region Get
-        public MapData GetMapData()
-        {
-            return _mapData;
-        }
-
         public Node? GetFirstSelectedNode()
         {
             return _firstSelectedNode;
@@ -54,7 +48,7 @@ namespace PathfindingWPF.Classes.Canvases
             DrawMap();
 
             _shortestPath.Clear();
-            _mapData.ResetNodes();
+            MapData.Instance.ResetNodes();
             _firstSelectedNode = null;
             _secondSelectedNode = null;
         }
@@ -64,9 +58,9 @@ namespace PathfindingWPF.Classes.Canvases
         public void DrawMap()
         {
             Children.Clear();
-            _mapData.RemoveAllLines();
+            MapData.Instance.RemoveAllLines();
 
-            if (_mapData.GetChunks().Count > 0)
+            if (MapData.Instance.GetChunks().Count > 0)
             {
                 DrawNodes();
                 DrawPaths();
@@ -75,7 +69,7 @@ namespace PathfindingWPF.Classes.Canvases
 
         private void DrawNodes()
         {
-            foreach (var node in _mapData.GetNodes())
+            foreach (var node in MapData.Instance.GetNodes())
             {
                 Brush nodeFill;
                 if (node == _firstSelectedNode || node == _secondSelectedNode)
@@ -119,7 +113,7 @@ namespace PathfindingWPF.Classes.Canvases
 
         private void CreateNode(Point mousePosition)
         {
-            foreach (var chunk in _mapData.GetChunks())
+            foreach (var chunk in MapData.Instance.GetChunks())
             {
                 if (mousePosition.X > chunk.Point.X &&
                     mousePosition.X < chunk.Point.X + chunk.SizeX &&
@@ -129,7 +123,7 @@ namespace PathfindingWPF.Classes.Canvases
                     var newNode = new Node(mousePosition);
 
                     chunk.AddNode(newNode);
-                    _mapData.AddNode(newNode);
+                    MapData.Instance.AddNode(newNode);
                 }
             }
             DrawMap();
@@ -140,11 +134,11 @@ namespace PathfindingWPF.Classes.Canvases
             var geometryGroup = new GeometryGroup();
             var geometryGroupShortestPath = new GeometryGroup();
 
-            foreach (var node in _mapData.GetNodes())
+            foreach (var node in MapData.Instance.GetNodes())
             {
                 foreach (var neighbor in node.GetNeighborNodes())
                 {
-                    if (!_mapData.GetLines().Any(x => (x.NodeId1 == node.Id && x.NodeId2 == neighbor.Id) || (x.NodeId2 == node.Id && x.NodeId1 == neighbor.Id)))
+                    if (!MapData.Instance.GetLines().Any(x => (x.NodeId1 == node.Id && x.NodeId2 == neighbor.Id) || (x.NodeId2 == node.Id && x.NodeId1 == neighbor.Id)))
                     {
                         if (_shortestPath.Contains(node) && _shortestPath.Contains(neighbor) && (node.ParentNode == neighbor || neighbor.ParentNode == node))
                         {
@@ -153,7 +147,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroupShortestPath.Children.Add(pathGeometry);
-                            _mapData.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            MapData.Instance.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
                         }
                         else
                         {
@@ -162,7 +156,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroup.Children.Add(pathGeometry);
-                            _mapData.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            MapData.Instance.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
                         }
                     }
                 }
@@ -172,15 +166,15 @@ namespace PathfindingWPF.Classes.Canvases
             {
                 Stroke = Brushes.Black,
                 StrokeThickness = 2,
+                Data = geometryGroup
             };
-            line.Data = geometryGroup;
 
             var lineShortestPath = new System.Windows.Shapes.Path
             {
                 Stroke = Brushes.Green,
                 StrokeThickness = 2,
+                Data = geometryGroupShortestPath
             };
-            lineShortestPath.Data = geometryGroupShortestPath;
 
             Children.Add(line);
             Children.Add(lineShortestPath);
@@ -188,51 +182,62 @@ namespace PathfindingWPF.Classes.Canvases
         #endregion
 
         #region Event Handlers
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private void OnInitialized(object? sender, EventArgs e)
         {
-            DrawMap();
+            MapData.Instance.Initialize(this);
         }
 
         private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var mousePosition = e.GetPosition((Canvas)sender);
+            if (_isHandlingMouseEvent) return;
 
-            var x = CollisionDetection.Use(mousePosition, _mapData);
+            _isHandlingMouseEvent = true;
 
-            switch (x)
+            try
             {
-                case Node:
-                    SelectNode((Node)x);
-                    break;
+                var mousePosition = e.GetPosition((Canvas)sender);
 
-                case Path:
-                    throw new NotImplementedException();
+                var x = CollisionDetection.Use(mousePosition);
 
-                case CollisionDetection.ENewNode.True:
-                    CreateNode(mousePosition);
-                    break;
+                switch (x)
+                {
+                    case Node:
+                        SelectNode((Node)x);
+                        break;
 
-                case CollisionDetection.ENewNode.False:
-                    break;
+                    case Path:
+                        throw new NotImplementedException();
 
-                default:
-                    throw new Exception("CollisionDetection Error");
+                    case CollisionDetection.ENewNode.True:
+                        CreateNode(mousePosition);
+                        break;
+
+                    case CollisionDetection.ENewNode.False:
+                        break;
+
+                    default:
+                        throw new Exception("CollisionDetection Error");
+                }
+            }
+            finally
+            {
+                _isHandlingMouseEvent = false;
             }
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (ActualWidth > _mapData.GetMapSizeX() - _mapData.GetChunkSizeX() ||
-                ActualHeight > _mapData.GetMapSizeY() - _mapData.GetChunkSizeX())
+            if (ActualWidth > MapData.Instance.GetMapSizeX() - MapData.Instance.GetChunkSizeX() ||
+                ActualHeight > MapData.Instance.GetMapSizeY() - MapData.Instance.GetChunkSizeX())
             {
-                _mapData.GetMapDataFromDatabase();
+                MapData.Instance.GetMapDataFromDatabase();
                 DrawMap();
             }
 
-            if (ActualWidth + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX() ||
-                ActualHeight + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX())
+            if (ActualWidth + MapData.Instance.GetChunkSizeX() < MapData.Instance.GetMapSizeX() ||
+                ActualHeight + MapData.Instance.GetChunkSizeX() < MapData.Instance.GetMapSizeX())
             {
-                _mapData.GetMapDataFromDatabase();
+                MapData.Instance.GetMapDataFromDatabase();
                 DrawMap();
             }
         }

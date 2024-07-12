@@ -28,14 +28,14 @@ namespace PathfindingWPF.Classes.Database
             var chunks = new List<Chunk>();
 
             double y = 0;
-            int chunkSize = 250;
+            int chunkSize = MapData.Instance.GetChunkSizeX();
 
             while (y < canvasHeight + chunkSize)
             {
                 double x = 0;
                 while (x < canvasWidth + chunkSize)
                 {
-                    var chunk = new Chunk(new Point(x, y), chunkSize);
+                    var chunk = new Chunk(new Point(x, y));
                     x += chunkSize;
                     chunk.AddNode(GetChunkNodes(chunk));
                     chunks.Add(chunk);

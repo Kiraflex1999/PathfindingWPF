@@ -9,11 +9,11 @@ namespace PathfindingWPF.Classes.MapObjects
         public Point Point { get; init; }
         public int SizeX { get; init; }
 
-        public Chunk(Point point, int sizeX)
+        public Chunk(Point point)
         {
             Point = point;
-            SizeX = sizeX;
             _nodes = new();
+            SizeX = MapData.Instance.GetChunkSizeX();
         }
 
         #region Chunk

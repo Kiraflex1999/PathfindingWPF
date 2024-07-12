@@ -35,7 +35,7 @@ namespace PathfindingWPF
 
         private void ButtonCreatePath_Click(object sender, RoutedEventArgs e)
         {
-
+            MyCanvas.CreatePath();
         }
         #endregion
     }

@@ -227,6 +227,11 @@ namespace PathfindingWPF.Classes.MapObjects
         {
             if (path == null) { return; }
             _paths.Add(path);
+
+            var nodes = _nodes.Where(n => n.Id == path.NodeId1 || n.Id == path.NodeId2).ToList();
+
+            nodes[0].AddNeighborNode(nodes[1]);
+            nodes[1].AddNeighborNode(nodes[0]);
         }
 
         public void AddPath(List<Path> paths)

@@ -104,7 +104,7 @@ namespace PathfindingWPF.Classes.Database
         }
         #endregion
 
-        #region SetData
+        #region AddData
         #endregion
     }
 }

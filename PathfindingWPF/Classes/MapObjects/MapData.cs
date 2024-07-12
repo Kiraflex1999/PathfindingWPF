@@ -9,6 +9,7 @@ namespace PathfindingWPF.Classes.MapObjects
         private List<Node> _nodes;
         private List<Node> _removedNodes;
         private List<Path> _paths;
+        private List<Path> _removedPaths;
         private HashSet<Path> _lines;
         private int _mapSizeX;
         private int _mapSizeY;
@@ -28,6 +29,7 @@ namespace PathfindingWPF.Classes.MapObjects
             _paths = new List<Path>();
             _lines = new HashSet<Path>();
             _removedNodes = new List<Node>();
+            _removedPaths = new List<Path>();
         }
 
         public void Initialize(Canvas myCanvas)
@@ -223,19 +225,10 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
-        public void AddPath(Path path, Node node1, Node node2)
+        public void AddLine(Node node1, Node node2)
         {
-            if (path == null) { return; }
-            _paths.Add(path);
-
             node1.AddNeighborNode(node2);
             node2.AddNeighborNode(node1);
-        }
-
-        public void AddLine(Path line)
-        {
-            if (line == null) { return; }
-            _lines.Add(line);
         }
         #endregion
 
@@ -275,17 +268,9 @@ namespace PathfindingWPF.Classes.MapObjects
             }
         }
 
-        public bool RemovePath(Path path)
+        public bool RemovePath(Path path, Node node1, Node node2)
         {
             return _paths.Remove(path);
-        }
-
-        public void RemovePath(List<Path> paths)
-        {
-            foreach (var path in paths)
-            {
-                RemovePath(path);
-            }
         }
 
         public bool RemoveLine(Path path)

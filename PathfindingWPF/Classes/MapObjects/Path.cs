@@ -9,7 +9,7 @@ namespace PathfindingWPF.Classes.MapObjects
         public PathGeometry? PathGeometry { get; set; }
 
         #region Constructor
-        public Path(int nodeId1, int nodeId2)
+        public Path(int nodeId1 = 0, int nodeId2 = 0)
         {
             NodeId1 = nodeId1;
             NodeId2 = nodeId2;

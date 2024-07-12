@@ -6,7 +6,7 @@ namespace PathfindingWPF.Classes.MapObjects
     {
         private List<Node> _neighborNodes;
 
-        public int Id { get; init; }
+        public int Id { get; private set; }
         public Point Point { get; set; }
         public double Radius { get; set; } = 10;
         public double CostFromStart { get; set; }
@@ -67,6 +67,14 @@ namespace PathfindingWPF.Classes.MapObjects
         public void RemoveNeighborNode(Node node)
         {
             _neighborNodes.Remove(node);
+        }
+
+        public void SetId(int id)
+        {
+            if (Id == 0)
+            {
+                Id = id;
+            }
         }
         #endregion
 

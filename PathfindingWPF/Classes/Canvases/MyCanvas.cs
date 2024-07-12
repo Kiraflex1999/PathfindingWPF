@@ -8,20 +8,22 @@ using System.Windows.Media;
 
 namespace PathfindingWPF.Classes.Canvases
 {
-    internal class MyCanvas
+    public class MyCanvas : Canvas
     {
-        private Canvas _myCanvas;
         private MapData _mapData;
         private Node? _firstSelectedNode;
         private Node? _secondSelectedNode;
         private List<Node> _shortestPath;
         private bool _switchSelect;
 
-        public MyCanvas(Canvas myCanvas)
+        public MyCanvas()
         {
-            _myCanvas = myCanvas;
-            _mapData = new MapData(myCanvas);
+            _mapData = new MapData(this);
             _shortestPath = new List<Node>();
+
+            MouseLeftButtonUp += OnMouseLeftButtonUp;
+            SizeChanged += OnSizeChanged;
+            Loaded += OnLoaded;
         }
 
         #region Get
@@ -59,14 +61,9 @@ namespace PathfindingWPF.Classes.Canvases
         #endregion
 
         #region MyCanvas
-        public ref Canvas GetMyCanvas()
-        {
-            return ref _myCanvas;
-        }
-
         public void DrawMap()
         {
-            _myCanvas.Children.Clear();
+            Children.Clear();
             _mapData.RemoveAllLines();
 
             if (_mapData.GetChunks().Count > 0)
@@ -100,7 +97,7 @@ namespace PathfindingWPF.Classes.Canvases
                     StrokeThickness = 2
                 };
 
-                _myCanvas.Children.Add(nodePath);
+                Children.Add(nodePath);
             }
         }
 
@@ -185,13 +182,18 @@ namespace PathfindingWPF.Classes.Canvases
             };
             lineShortestPath.Data = geometryGroupShortestPath;
 
-            _myCanvas.Children.Add(line);
-            _myCanvas.Children.Add(lineShortestPath);
+            Children.Add(line);
+            Children.Add(lineShortestPath);
         }
         #endregion
 
         #region Event Handlers
-        public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            DrawMap();
+        }
+
+        private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             var mousePosition = e.GetPosition((Canvas)sender);
 
@@ -218,17 +220,17 @@ namespace PathfindingWPF.Classes.Canvases
             }
         }
 
-        public void SizeChanged(object sender, SizeChangedEventArgs e)
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_myCanvas.ActualWidth > _mapData.GetMapSizeX() - _mapData.GetChunkSizeX() ||
-                _myCanvas.ActualHeight > _mapData.GetMapSizeY() - _mapData.GetChunkSizeX())
+            if (ActualWidth > _mapData.GetMapSizeX() - _mapData.GetChunkSizeX() ||
+                ActualHeight > _mapData.GetMapSizeY() - _mapData.GetChunkSizeX())
             {
                 _mapData.GetMapDataFromDatabase();
                 DrawMap();
             }
 
-            if (_myCanvas.ActualWidth + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX() ||
-                _myCanvas.ActualHeight + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX())
+            if (ActualWidth + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX() ||
+                ActualHeight + _mapData.GetChunkSizeX() < _mapData.GetMapSizeX())
             {
                 _mapData.GetMapDataFromDatabase();
                 DrawMap();

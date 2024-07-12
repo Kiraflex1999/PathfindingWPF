@@ -28,7 +28,7 @@ namespace PathfindingWPF.Classes.Logic
                         {
                             return node;
                         }
-                        if (distance > node.Radius && distance < node.Radius * 2)
+                        if (distance > node.Radius && distance <= node.Radius * 2)
                         {
                             return ENewNode.False;
                         }

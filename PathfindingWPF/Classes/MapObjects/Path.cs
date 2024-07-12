@@ -2,7 +2,7 @@
 
 namespace PathfindingWPF.Classes.MapObjects
 {
-    internal class Path
+    public class Path
     {
         public int NodeId1 { get; init; }
         public int NodeId2 { get; init; }

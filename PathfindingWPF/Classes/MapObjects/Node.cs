@@ -2,7 +2,7 @@
 
 namespace PathfindingWPF.Classes.MapObjects
 {
-    internal class Node
+    public class Node
     {
         private List<Node> _neighborNodes;
 

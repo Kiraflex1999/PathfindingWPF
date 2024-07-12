@@ -4,14 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PathfindingWPF"
+        xmlns:canvases="clr-namespace:PathfindingWPF.Classes.Canvases"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Canvas Name="MyCanvas"
-                MouseLeftButtonUp="MyCanvas_MouseLeftButtonUp"
-                Background="White" 
-                SizeChanged="MyCanvas_SizeChanged" 
-                Loaded="MyCanvas_Loaded"/>
+        <canvases:MyCanvas x:Name="MyCanvas"
+                Background="White"/>
 
         <Canvas Name="TestCanvas"
                 Height="50"

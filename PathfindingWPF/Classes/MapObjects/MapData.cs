@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace PathfindingWPF.Classes.MapObjects
 {
-    internal class MapData
+    public class MapData
     {
         private List<Chunk> _chunks;
         private List<Node> _nodes;

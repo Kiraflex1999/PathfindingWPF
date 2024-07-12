@@ -2,7 +2,7 @@
 
 namespace PathfindingWPF.Classes.MapObjects
 {
-    internal class Chunk
+    public class Chunk
     {
         private List<Node> _nodes;
 

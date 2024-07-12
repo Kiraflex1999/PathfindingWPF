@@ -163,11 +163,6 @@ namespace PathfindingWPF.Classes.MapObjects
             return _nodes;
         }
 
-        public List<Path> GetPaths()
-        {
-            return _paths;
-        }
-
         public HashSet<Path> GetLines()
         {
             return _lines;
@@ -189,40 +184,11 @@ namespace PathfindingWPF.Classes.MapObjects
         }
         #endregion
 
-        #region Set
-        public void SetCanvas(Canvas canvas)
-        {
-            _myCanvas = canvas;
-        }
-        #endregion
-
         #region Add
-        public void AddChunk(Chunk chunk)
-        {
-            if (chunk == null) { return; }
-            _chunks.Add(chunk);
-        }
-
-        public void AddChunk(List<Chunk> chunks)
-        {
-            foreach (var chunk in chunks)
-            {
-                AddChunk(chunk);
-            }
-        }
-
         public void AddNode(Node node)
         {
             if (node == null) { return; }
             _nodes.Add(node);
-        }
-
-        public void AddNode(List<Node> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                AddNode(node);
-            }
         }
 
         public void AddLine(Node node1, Node node2)
@@ -233,19 +199,6 @@ namespace PathfindingWPF.Classes.MapObjects
         #endregion
 
         #region Remove
-        public bool RemoveChunk(Chunk chunk)
-        {
-            return _chunks.Remove(chunk);
-        }
-
-        public void RemoveChunk(List<Chunk> chunks)
-        {
-            foreach (var chunk in chunks)
-            {
-                RemoveChunk(chunk);
-            }
-        }
-
         public void RemoveNode(Node node)
         {
             _nodes.Remove(node);
@@ -257,32 +210,6 @@ namespace PathfindingWPF.Classes.MapObjects
                 {
                     chunk.RemoveNode(node);
                 }
-            }
-        }
-
-        public void RemoveNode(List<Node> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                RemoveNode(node);
-            }
-        }
-
-        public bool RemovePath(Path path, Node node1, Node node2)
-        {
-            return _paths.Remove(path);
-        }
-
-        public bool RemoveLine(Path path)
-        {
-            return _lines.Remove(path);
-        }
-
-        public void RemoveLine(List<Path> paths)
-        {
-            foreach (var path in paths)
-            {
-                RemoveLine(path);
             }
         }
 

@@ -115,10 +115,7 @@ namespace PathfindingWPF.Classes.Canvases
         {
             foreach (var chunk in MapData.Instance.GetChunks())
             {
-                if (mousePosition.X > chunk.Point.X &&
-                    mousePosition.X < chunk.Point.X + chunk.SizeX &&
-                    mousePosition.Y > chunk.Point.Y &&
-                    mousePosition.Y < chunk.Point.Y + chunk.SizeX)
+                if (chunk.IsPosistionInChunk(mousePosition))
                 {
                     var newNode = new Node(mousePosition);
 

@@ -13,28 +13,20 @@ namespace PathfindingWPF.Classes.Logic
 
         public static object? Use(Point mousePosition)
         {
-            foreach (var chunk in MapData.Instance.GetChunks())
+            foreach (var node in MapData.Instance.GetNodes())
             {
-                if (mousePosition.X > chunk.Point.X &&
-                    mousePosition.X < chunk.Point.X + chunk.SizeX &&
-                    mousePosition.Y > chunk.Point.Y &&
-                    mousePosition.Y < chunk.Point.Y + chunk.SizeX)
-                {
-                    foreach (var node in chunk.GetNodes())
-                    {
-                        double distance = CalculateDelta(mousePosition, node);
+                double distance = CalculateDelta(mousePosition, node);
 
-                        if (distance <= node.Radius)
-                        {
-                            return node;
-                        }
-                        if (distance > node.Radius && distance <= node.Radius * 2 + 5)
-                        {
-                            return ENewNode.False;
-                        }
-                    }
+                if (distance <= node.Radius)
+                {
+                    return node;
+                }
+                if (distance > node.Radius && distance <= node.Radius * 2 + 5)
+                {
+                    return ENewNode.False;
                 }
             }
+
             return ENewNode.True;
         }
 

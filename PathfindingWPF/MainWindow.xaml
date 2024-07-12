@@ -11,15 +11,6 @@
         <canvases:MyCanvas x:Name="MyCanvas"
                 Background="White"/>
 
-        <Canvas Name="TestCanvas"
-                Height="50"
-                MaxHeight="50"
-                Width="50"
-                MaxWidth="50"
-                Background="Black" 
-                HorizontalAlignment="Left" 
-                VerticalAlignment="Top"/>
-
         <Button Name="ButtonPathFinding"
                 Height="25"
                 MaxHeight="25"

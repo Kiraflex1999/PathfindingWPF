@@ -5,7 +5,6 @@ namespace PathfindingWPF.Classes.MapObjects
 {
     public class MapData
     {
-        private static readonly MapData _instance = new MapData();
         private List<Chunk> _chunks;
         private List<Node> _nodes;
         private List<Path> _paths;
@@ -16,6 +15,10 @@ namespace PathfindingWPF.Classes.MapObjects
         private SQL _sql;
         private Canvas? _myCanvas;
 
+        private static readonly Lazy<MapData> _instance = new(() => new MapData());
+
+        public static MapData Instance => _instance.Value;
+
         private MapData()
         {
             _sql = new SQL();
@@ -25,22 +28,11 @@ namespace PathfindingWPF.Classes.MapObjects
             _lines = new HashSet<Path>();
         }
 
-        public static MapData Instance
-        {
-            get { return _instance; }
-        }
-
         public void Initialize(Canvas myCanvas)
         {
-            if (_myCanvas == null && myCanvas != null)
-            {
-                _myCanvas = myCanvas;
-                GetMapDataFromDatabase();
-            }
-            else
-            {
-                throw new ArgumentNullException(nameof(myCanvas));
-            }
+            _myCanvas = myCanvas;
+
+            GetMapDataFromDatabase();
         }
 
         #region Database

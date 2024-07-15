@@ -99,9 +99,9 @@ namespace PathfindingWPF.Classes.MapObjects
                 var neighbors = new List<Node>();
                 foreach (var path in _paths)
                 {
-                    if (path.NodeId1 == node.Id)
+                    if (path.Node1 == node)
                     {
-                        var neighbor = _nodes.Find(n => n.Id == path.NodeId2);
+                        var neighbor = _nodes.Find(n => n == path.Node2);
                         if (neighbor != null)
                         {
                             if (!neighbors.Contains(neighbor))
@@ -110,9 +110,9 @@ namespace PathfindingWPF.Classes.MapObjects
                             }
                         }
                     }
-                    else if (path.NodeId2 == node.Id)
+                    else if (path.Node2 == node)
                     {
-                        var neighbor = _nodes.Find(n => n.Id == path.NodeId1);
+                        var neighbor = _nodes.Find(n => n == path.Node1);
                         if (neighbor != null)
                         {
                             if (!neighbors.Contains(neighbor))

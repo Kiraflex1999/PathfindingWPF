@@ -4,21 +4,21 @@ namespace PathfindingWPF.Classes.MapObjects
 {
     public class Path
     {
-        public int NodeId1 { get; init; }
-        public int NodeId2 { get; init; }
+        public Node Node1 { get; init; }
+        public Node Node2 { get; init; }
         public PathGeometry? PathGeometry { get; set; }
 
         #region Constructor
-        public Path(int nodeId1 = 0, int nodeId2 = 0)
+        public Path(Node node1, Node node2)
         {
-            NodeId1 = nodeId1;
-            NodeId2 = nodeId2;
+            Node1 = node1;
+            Node2 = node2;
         }
 
-        public Path(int nodeId1, int nodeId2, PathGeometry pathGeometry)
+        public Path(Node node1, Node node2, PathGeometry pathGeometry)
         {
-            NodeId1 = nodeId1;
-            NodeId2 = nodeId2;
+            Node1 = node1;
+            Node2 = node2;
             PathGeometry = pathGeometry;
         }
         #endregion

@@ -93,7 +93,19 @@ namespace PathfindingWPF.Classes.Database
                         {
                             var record = (IDataRecord)reader;
 
-                            paths.Add(new Path((int)record[0], (int)record[1]));
+                            if (!MapData.Instance.GetNodes().Contains(MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).FirstOrDefault(new Node(new Point(-1, -1)))))
+                            {
+                                continue;
+                            }
+                            if (!MapData.Instance.GetNodes().Contains(MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).FirstOrDefault(new Node(new Point(-1, -1)))))
+                            {
+                                continue;
+                            }
+
+                            var node1 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).First();
+                            var node2 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).First();
+
+                            paths.Add(new Path(node1, node2));
                         }
                     }
                     _connection.Close();

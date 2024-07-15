@@ -154,6 +154,7 @@ namespace PathfindingWPF.Classes.Canvases
         {
             if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
 
+
         }
 
         private void DrawPaths()
@@ -165,7 +166,7 @@ namespace PathfindingWPF.Classes.Canvases
             {
                 foreach (var neighbor in node.GetNeighborNodes())
                 {
-                    if (!MapData.Instance.GetLines().Any(x => (x.NodeId1 == node.Id && x.NodeId2 == neighbor.Id) || (x.NodeId2 == node.Id && x.NodeId1 == neighbor.Id)))
+                    if (!MapData.Instance.GetLines().Any(x => (x.Node1 == node && x.Node2 == neighbor) || (x.Node2 == node && x.Node1 == neighbor)))
                     {
                         if (_shortestPath.Contains(node) && _shortestPath.Contains(neighbor) && (node.ParentNode == neighbor || neighbor.ParentNode == node))
                         {
@@ -174,7 +175,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroupShortestPath.Children.Add(pathGeometry);
-                            MapData.Instance.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            MapData.Instance.GetLines().Add(new Path(node, neighbor, pathGeometry));
                         }
                         else
                         {
@@ -183,7 +184,7 @@ namespace PathfindingWPF.Classes.Canvases
                             pathFigure.Segments.Add(new LineSegment(neighbor.Point, true));
                             pathGeometry.Figures.Add(pathFigure);
                             geometryGroup.Children.Add(pathGeometry);
-                            MapData.Instance.GetLines().Add(new Path(node.Id, neighbor.Id, pathGeometry));
+                            MapData.Instance.GetLines().Add(new Path(node, neighbor, pathGeometry));
                         }
                     }
                 }

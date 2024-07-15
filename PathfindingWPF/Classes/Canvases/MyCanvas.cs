@@ -145,7 +145,7 @@ namespace PathfindingWPF.Classes.Canvases
         {
             if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
 
-            MapData.Instance.AddLine(_firstSelectedNode, _secondSelectedNode);
+            MapData.Instance.AddPath(_firstSelectedNode, _secondSelectedNode);
 
             DrawMap();
         }
@@ -154,7 +154,9 @@ namespace PathfindingWPF.Classes.Canvases
         {
             if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
 
+            MapData.Instance.RemovePath(_firstSelectedNode, _secondSelectedNode);
 
+            DrawMap();
         }
 
         private void DrawPaths()

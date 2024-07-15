@@ -191,10 +191,12 @@ namespace PathfindingWPF.Classes.MapObjects
             _nodes.Add(node);
         }
 
-        public void AddLine(Node node1, Node node2)
+        public void AddPath(Node node1, Node node2)
         {
             node1.AddNeighborNode(node2);
             node2.AddNeighborNode(node1);
+
+            _paths.Add(new Path(node1, node2));
         }
         #endregion
 
@@ -232,6 +234,33 @@ namespace PathfindingWPF.Classes.MapObjects
             {
                 node.ParentNode = null;
                 node.CalculateCostsReset();
+            }
+        }
+
+        public void RemovePath(Node node1, Node node2)
+        {
+            Path? pathToRemove = null;
+
+            foreach (var path in _paths.Where(p => p.Node1 == node1 || p.Node1 == node2))
+            {
+                if (path.Node2 == node2)
+                {
+                    pathToRemove = path;
+                    break;
+                }
+                if (path.Node2 == node1)
+                {
+                    pathToRemove = path;
+                    break;
+                }
+            }
+
+            if (pathToRemove != null)
+            {
+                _paths.Remove(pathToRemove);
+                node1.RemoveNeighborNode(node2);
+                node2.RemoveNeighborNode(node1);
+                _removedPaths.Add(pathToRemove);
             }
         }
         #endregion

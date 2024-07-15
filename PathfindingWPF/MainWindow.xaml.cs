@@ -17,7 +17,7 @@ namespace PathfindingWPF
 
         private void ButtonDeletePath_Click(object sender, RoutedEventArgs e)
         {
-
+            MyCanvas.DeletePath();
         }
 
         private void ButtonDeleteNode_Click(object sender, RoutedEventArgs e)

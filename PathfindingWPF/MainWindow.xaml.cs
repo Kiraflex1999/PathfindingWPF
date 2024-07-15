@@ -27,10 +27,7 @@ namespace PathfindingWPF
 
         private void ButtonPathFinding_Click(object sender, RoutedEventArgs e)
         {
-            if (MyCanvas.GetFirstSelectedNode() != null && MyCanvas.GetSecondSelectedNode() != null)
-            {
-                MyCanvas.UsePathFinding();
-            }
+            MyCanvas.UsePathFinding();
         }
 
         private void ButtonCreatePath_Click(object sender, RoutedEventArgs e)

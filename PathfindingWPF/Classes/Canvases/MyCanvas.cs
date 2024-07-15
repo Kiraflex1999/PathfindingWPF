@@ -25,18 +25,6 @@ namespace PathfindingWPF.Classes.Canvases
             Initialized += OnInitialized;
         }
 
-        #region Get
-        public Node? GetFirstSelectedNode()
-        {
-            return _firstSelectedNode;
-        }
-
-        public Node? GetSecondSelectedNode()
-        {
-            return _firstSelectedNode;
-        }
-        #endregion
-
         #region Pathfinding
         public void UsePathFinding()
         {
@@ -131,13 +119,30 @@ namespace PathfindingWPF.Classes.Canvases
             if (_firstSelectedNode != null)
             {
                 MapData.Instance.RemoveNode(_firstSelectedNode);
+
+                var nodes = new List<Node>(_firstSelectedNode.GetNeighborNodes());
+
+                foreach (var node in nodes)
+                {
+                    MapData.Instance.RemovePath(_firstSelectedNode, _firstSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                }
+
                 _firstSelectedNode = null;
             }
             if (_secondSelectedNode != null)
             {
                 MapData.Instance.RemoveNode(_secondSelectedNode);
+
+                var nodes = new List<Node>(_secondSelectedNode.GetNeighborNodes());
+
+                foreach (var node in nodes)
+                {
+                    MapData.Instance.RemovePath(_secondSelectedNode, _secondSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                }
+
                 _secondSelectedNode = null;
             }
+
             DrawMap();
         }
 

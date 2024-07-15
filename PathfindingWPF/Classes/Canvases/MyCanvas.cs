@@ -43,6 +43,93 @@ namespace PathfindingWPF.Classes.Canvases
         #endregion
 
         #region MyCanvas
+        private void SelectNode(Node x)
+        {
+            if (_switchSelect)
+            {
+                _firstSelectedNode = (Node)x;
+                DrawMap();
+                _switchSelect = false;
+            }
+            else
+            {
+                _secondSelectedNode = (Node)x;
+                DrawMap();
+                _switchSelect = true;
+            }
+        }
+        #endregion
+
+        #region Delete
+        public void DeletePath()
+        {
+            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
+
+            MapData.Instance.RemovePath(_firstSelectedNode, _secondSelectedNode);
+
+            DrawMap();
+        }
+
+        public void DeleteNodes()
+        {
+            if (_firstSelectedNode != null)
+            {
+                MapData.Instance.RemoveNode(_firstSelectedNode);
+
+                var nodes = new List<Node>(_firstSelectedNode.GetNeighborNodes());
+
+                foreach (var node in nodes)
+                {
+                    MapData.Instance.RemovePath(_firstSelectedNode, _firstSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                }
+
+                _firstSelectedNode = null;
+            }
+            if (_secondSelectedNode != null)
+            {
+                MapData.Instance.RemoveNode(_secondSelectedNode);
+
+                var nodes = new List<Node>(_secondSelectedNode.GetNeighborNodes());
+
+                foreach (var node in nodes)
+                {
+                    MapData.Instance.RemovePath(_secondSelectedNode, _secondSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                }
+
+                _secondSelectedNode = null;
+            }
+
+            DrawMap();
+        }
+        #endregion
+
+        #region Create
+        public void CreatePath()
+        {
+            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
+
+            MapData.Instance.AddPath(_firstSelectedNode, _secondSelectedNode);
+
+            DrawMap();
+        }
+
+        private void CreateNode(Point mousePosition)
+        {
+            foreach (var chunk in MapData.Instance.GetChunks())
+            {
+                if (chunk.IsPosistionInChunk(mousePosition))
+                {
+                    var newNode = new Node(mousePosition);
+
+                    chunk.AddNode(newNode);
+                    MapData.Instance.AddNode(newNode);
+                }
+            }
+            DrawMap();
+        }
+        #endregion
+
+        #region Draw
         public void DrawMap()
         {
             Children.Clear();
@@ -81,87 +168,6 @@ namespace PathfindingWPF.Classes.Canvases
 
                 Children.Add(nodePath);
             }
-        }
-
-        private void SelectNode(Node x)
-        {
-            if (_switchSelect)
-            {
-                _firstSelectedNode = (Node)x;
-                DrawMap();
-                _switchSelect = false;
-            }
-            else
-            {
-                _secondSelectedNode = (Node)x;
-                DrawMap();
-                _switchSelect = true;
-            }
-        }
-
-        private void CreateNode(Point mousePosition)
-        {
-            foreach (var chunk in MapData.Instance.GetChunks())
-            {
-                if (chunk.IsPosistionInChunk(mousePosition))
-                {
-                    var newNode = new Node(mousePosition);
-
-                    chunk.AddNode(newNode);
-                    MapData.Instance.AddNode(newNode);
-                }
-            }
-            DrawMap();
-        }
-
-        public void DeleteNodes()
-        {
-            if (_firstSelectedNode != null)
-            {
-                MapData.Instance.RemoveNode(_firstSelectedNode);
-
-                var nodes = new List<Node>(_firstSelectedNode.GetNeighborNodes());
-
-                foreach (var node in nodes)
-                {
-                    MapData.Instance.RemovePath(_firstSelectedNode, _firstSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
-                }
-
-                _firstSelectedNode = null;
-            }
-            if (_secondSelectedNode != null)
-            {
-                MapData.Instance.RemoveNode(_secondSelectedNode);
-
-                var nodes = new List<Node>(_secondSelectedNode.GetNeighborNodes());
-
-                foreach (var node in nodes)
-                {
-                    MapData.Instance.RemovePath(_secondSelectedNode, _secondSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
-                }
-
-                _secondSelectedNode = null;
-            }
-
-            DrawMap();
-        }
-
-        public void CreatePath()
-        {
-            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
-
-            MapData.Instance.AddPath(_firstSelectedNode, _secondSelectedNode);
-
-            DrawMap();
-        }
-
-        public void DeletePath()
-        {
-            if (_firstSelectedNode == null || _secondSelectedNode == null) { return; }
-
-            MapData.Instance.RemovePath(_firstSelectedNode, _secondSelectedNode);
-
-            DrawMap();
         }
 
         private void DrawPaths()

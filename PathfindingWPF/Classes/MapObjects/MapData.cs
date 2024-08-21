@@ -150,6 +150,11 @@ namespace PathfindingWPF.Classes.MapObjects
 
             return _sql.GetChunks(_myCanvas.ActualHeight, _myCanvas.ActualWidth);
         }
+
+        public void SaveToDatabase()
+        {
+            _sql.Save(_nodes, _removedNodes, _paths, _removedPaths);
+        }
         #endregion
 
         #region Get

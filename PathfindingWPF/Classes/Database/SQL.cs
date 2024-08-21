@@ -80,30 +80,39 @@ namespace PathfindingWPF.Classes.Database
             foreach (var node in nodes)
             {
                 string query =
-                    $"SELECT * FROM dbo.Nodes_Nodes WHERE NodesId1 = " +
-                    $"(SELECT Id FROM dbo.Nodes WHERE X = {node.Point.X} AND Y = {node.Point.Y}) " +
-                    $"OR NodesId2 = (SELECT Id FROM dbo.Nodes WHERE X = {node.Point.X} AND Y = {node.Point.Y});";
+                    $"SELECT * FROM dbo.Nodes_Nodes WHERE NodesId1 = {node.Id} " +
+                    $"OR NodesId2 = {node.Id};";
 
                 using (SqlCommand command = new(query, _connection))
                 {
                     _connection.Open();
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        IDataRecord? record = null;
+
                         while (reader.Read())
                         {
-                            var record = (IDataRecord)reader;
+                            record = (IDataRecord)reader;
 
-                            if (!MapData.Instance.GetNodes().Contains(MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).FirstOrDefault(new Node(new Point(-1, -1)))))
+                            if (MapData.Instance.GetNodes().Count < 2)
+                            {
+                                break;
+                            }
+
+                            if (MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).ToList().Count == 0 ||
+                                MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).ToList().Count == 0)
                             {
                                 continue;
                             }
-                            if (!MapData.Instance.GetNodes().Contains(MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).FirstOrDefault(new Node(new Point(-1, -1)))))
+
+                            Node node1 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).First();
+                            Node node2 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).First();
+
+                            if (paths.Where(p => p.Node1 == node1 && p.Node2 == node2 ||
+                                p.Node1 == node2 && p.Node2 == node1).ToList().Count > 0)
                             {
                                 continue;
                             }
-
-                            var node1 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[0]).First();
-                            var node2 = MapData.Instance.GetNodes().Where(n => n.Id == (int)record[1]).First();
 
                             paths.Add(new Path(node1, node2));
                         }
@@ -117,6 +126,82 @@ namespace PathfindingWPF.Classes.Database
         #endregion
 
         #region AddData
+        public void Save(List<Node> nodes, List<Node> removedNodes, List<Path> paths, List<Path> removedPaths)
+        {
+            SavePaths(paths, removedPaths);
+            SaveNodes(nodes, removedNodes);
+        }
+
+        private void SavePaths(List<Path> paths, List<Path> removedPaths)
+        {
+            foreach (var path in paths)
+            {
+                string query =
+                    $"IF NOT EXISTS (SELECT * FROM dbo.Nodes_Nodes " +
+                    $"WHERE NodesId1 = {path.Node1.Id} AND NodesId2 = {path.Node2.Id} " +
+                    $"OR NodesId1 = {path.Node2.Id} AND NodesId2 = {path.Node1.Id}) " +
+                    $"BEGIN " +
+                    $"INSERT INTO dbo.Nodes_Nodes VALUES ({path.Node1.Id}, {path.Node2.Id}) " +
+                    $"END;";
+
+                _connection.Open();
+                using (SqlCommand command = new(query, _connection))
+                {
+                    command.BeginExecuteNonQuery();
+                }
+                _connection.Close();
+            }
+
+            foreach (var path in removedPaths)
+            {
+                string query =
+                    $"IF EXIST (SELECT * FROM dbo.Nodes_Nodes " +
+                    $"WHERE NodesId1 = {path.Node1.Id} AND NodesId2 = {path.Node2.Id} " +
+                    $"OR NodesId1 = {path.Node2.Id} AND NodesId2 = {path.Node1.Id}) " +
+                    $"BEGIN " +
+                    $"DELETE FROM dbo.Nodes_Nodes WHERE NodesId1 = {path.Node1.Id} AND NodesId2 = {path.Node2.Id} " +
+                    $"OR NodesId1 = {path.Node2.Id} AND NodesId2 = {path.Node1.Id}) " +
+                    $"END;";
+
+                _connection.Open();
+                using (SqlCommand command = new(query, _connection))
+                {
+                    command.BeginExecuteNonQuery();
+                }
+                _connection.Close();
+            }
+        }
+
+        private void SaveNodes(List<Node> nodes, List<Node> removedNodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (node.Id > 0) { continue; }
+
+                string query = $"INSERT INTO dbo.Nodes (X, Y) VALUES ({node.Point.X}, {node.Point.Y});";
+
+                _connection.Open();
+                using (SqlCommand command = new(query, _connection))
+                {
+                    command.BeginExecuteNonQuery();
+                }
+                _connection.Close();
+            }
+
+            foreach (var node in removedNodes)
+            {
+                if (node.Id == 0) { continue; }
+
+                string query = $"DELETE FROM dbo.Nodes WHERE Id = {node.Id};";
+
+                _connection.Open();
+                using (SqlCommand command = new(query, _connection))
+                {
+                    command.BeginExecuteNonQuery();
+                }
+                _connection.Close();
+            }
+        }
         #endregion
     }
 }

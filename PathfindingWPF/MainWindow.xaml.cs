@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using PathfindingWPF.Classes.MapObjects;
+using System.Windows;
 
 namespace PathfindingWPF
 {
@@ -12,7 +13,7 @@ namespace PathfindingWPF
         #region Buttons
         private void ButtonSaveToDatabase_Click(object sender, RoutedEventArgs e)
         {
-
+            MapData.Instance.SaveToDatabase();
         }
 
         private void ButtonDeletePath_Click(object sender, RoutedEventArgs e)

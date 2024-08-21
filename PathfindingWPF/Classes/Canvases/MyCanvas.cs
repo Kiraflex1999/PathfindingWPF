@@ -78,9 +78,9 @@ namespace PathfindingWPF.Classes.Canvases
 
                 var nodes = new List<Node>(_firstSelectedNode.GetNeighborNodes());
 
-                foreach (var node in nodes)
+                foreach (var neighbor in _firstSelectedNode.GetNeighborNodes())
                 {
-                    MapData.Instance.RemovePath(_firstSelectedNode, _firstSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                    MapData.Instance.RemovePath(_firstSelectedNode, neighbor);
                 }
 
                 _firstSelectedNode = null;
@@ -91,9 +91,9 @@ namespace PathfindingWPF.Classes.Canvases
 
                 var nodes = new List<Node>(_secondSelectedNode.GetNeighborNodes());
 
-                foreach (var node in nodes)
+                foreach (var neighbor in _secondSelectedNode.GetNeighborNodes())
                 {
-                    MapData.Instance.RemovePath(_secondSelectedNode, _secondSelectedNode.GetNeighborNodes().Where(n => n.Point == node.Point).First());
+                    MapData.Instance.RemovePath(_secondSelectedNode, neighbor);
                 }
 
                 _secondSelectedNode = null;
@@ -117,7 +117,7 @@ namespace PathfindingWPF.Classes.Canvases
         {
             foreach (var chunk in MapData.Instance.GetChunks())
             {
-                if (chunk.IsPosistionInChunk(mousePosition))
+                if (chunk.IsPositionInChunk(mousePosition))
                 {
                     var newNode = new Node(mousePosition);
 
